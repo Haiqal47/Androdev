@@ -13,3 +13,4 @@ Using this installer, people can get a fully working Eclipse IDE with Android De
 * Use this app at your own risk.
 * Nothing has tested.
 * No *release candidate* is planned.
+* Travis CI build will ALWAYS failing. Because of "IWshRuntimeLibrary" interface is not availiable in Docker.
