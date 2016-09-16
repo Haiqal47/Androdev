@@ -1,0 +1,160 @@
+﻿using Androdev.Core;
+using Androdev.Core.Diagostic;
+using Androdev.Localization;
+using Androdev.Model;
+using Androdev.View;
+using Androdev.View.Dialogs;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows.Forms;
+
+namespace Androdev.Presenter
+{
+    public class InstallerPresenter
+    {
+        private static readonly LogManager _logManager = LogManager.GetClassLogger();
+        private readonly InstallerModel _model;
+        private readonly InstallerView _view;
+
+        public InstallerModel Model
+        {
+            get { return _model; }
+        }
+
+        private readonly InstallManager _installManager;
+
+        public InstallerPresenter(InstallerView view)
+        {
+            _view = view;
+            _model = new InstallerModel();
+
+            _installManager = new InstallManager();
+            _installManager.InstallFinished += InstallManager_InstallFinished;
+            _installManager.InstallProgressChanged += InstallManager_InstallProgressChanged;
+            _installManager.InstallStarted += InstallManager_InstallStarted;
+
+            ConfigureDelegates();
+        }
+
+        #region Install Manager Subscriber
+        private void InstallManager_InstallStarted(object sender, EventArgs e)
+        {
+            UpdateSetupButton(1, true);
+            _model.LoadingAnimationVisible = true;
+        }
+
+        private void InstallManager_InstallProgressChanged(object sender, InstallProgressChangedEventArgs e)
+        {
+            var invoker = new Action<InstallProgressChangedEventArgs>(args =>
+            {
+                _model.ProgressStyle = (e.CurrentProgressPercentage == 99 ? ProgressBarStyle.Marquee : ProgressBarStyle.Blocks);
+                _model.CurrentProgressPercentage = e.CurrentProgressPercentage;
+                _model.OverallProgressPercentage = e.OverallProgressPercentage;
+                _model.StatusText = e.StatusText;
+                _model.DescriptionText = e.ExtraStatusText;
+            });
+            _view.Invoke(invoker, e);
+        }
+
+        private void InstallManager_InstallFinished(object sender, EventArgs e)
+        {
+            UpdateSetupButton(0, true);
+            _model.LoadingAnimationVisible = false;
+        }
+        #endregion
+
+        private void UpdateSetupButton(int imgIndex, bool enabled)
+        {
+            _model.SetupButtonImageIndex = imgIndex;
+            _model.SetupButtonEnabled = enabled;
+            if (imgIndex == 0)
+            {
+                _model.SetupButtonText = "Start installation";
+            }
+            else if (imgIndex == 1)
+            {
+                _model.SetupButtonText = "Stop installation";
+            }
+        }
+
+        #region Delegates
+        public EventHandler SetupClickEventHandler;
+        public EventHandler UpdatePackagesClickEventHandler;
+        public EventHandler SettingsClickEventHandler;
+        public EventHandler HelpClickEventHandler;
+        public EventHandler AboutClickEventHandler;
+
+        private void ConfigureDelegates()
+        {
+            SetupClickEventHandler = InstallHandler;
+            UpdatePackagesClickEventHandler = UpdatePackagesHandler;
+            SettingsClickEventHandler = SettingsClickHandler;
+            HelpClickEventHandler = HelpHandler;
+            AboutClickEventHandler = AboutHandler;
+        }
+
+        private void InstallHandler(object sender, EventArgs e)
+        {
+            if (_model.SetupButtonImageIndex == 0)
+            {
+                UpdateSetupButton(0, false);
+                _installManager.BeginInstall();
+            }
+            else if (_model.SetupButtonImageIndex == 1)
+            {
+                UpdateSetupButton(1, false);
+                _installManager.EndInstall();
+            }
+        }
+
+        private void UpdatePackagesHandler(object sender, EventArgs e)
+        {
+            if (MessageBox.Show(TextResource.UpdateConfirmationText, TextResource.UpdateConfirmationTitle,
+                                MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+                return;
+
+            using (var frm = new UpdatePackagesView())
+            {
+                frm.ShowDialog();
+            }
+        }
+
+        private void SettingsClickHandler(object sender, EventArgs e)
+        {
+            using (var frm = new InstallConfigDialog())
+            {
+                frm.InstallRoot = _installManager.InstallRoot;
+                frm.UacCompatibility = _installManager.UacCompatibility;
+                if (frm.ShowDialog() != DialogResult.OK) return;
+
+                try
+                {
+                    _installManager.SetInstallRoot(frm.InstallRoot);
+                    _installManager.SetUacCompatibility(frm.UacCompatibility);
+                    UpdateSetupButton(0, true);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(TextResource.CantChangeConfigText, TextResource.CantChangeConfigTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    _logManager.Error("Unable to change install config.", ex);
+                }
+            }
+        }
+
+        private void HelpHandler(object sender, EventArgs e)
+        {
+            MessageBox.Show(TextResource.HelpUnderConstructionText, TextResource.HelpUnderConstructionTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void AboutHandler(object sender, EventArgs e)
+        {
+            using (var frm = new AboutDialog())
+            {
+                frm.ShowDialog();
+            }
+        }
+        #endregion
+
+    }
+}
