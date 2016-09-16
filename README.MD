@@ -1,4 +1,4 @@
-# Androdev
+# Androdev [![Build Status](https://travis-ci.org/fahminlb33/Androdev.svg?branch=master)](https://travis-ci.org/fahminlb33/Androdev)
 Enhaced Android development environment.
 
 ## Purpose
