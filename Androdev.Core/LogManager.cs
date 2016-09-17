@@ -21,7 +21,7 @@ namespace Androdev.Core
 {
     public class LogManager
     {
-        private const string LogFormatString = "{0}  {1} {2}{3}: {4}";
+        private const string LogFormatString = "{0}  {1} [{2}][{3}] {4}";
         private const string ShortDateFormat = "yyyy-MM-dd";        // ISO8601
         private const string LongDateFormat = "yyyyMMdd'T'HHmmss";  // ISO8601
 
@@ -56,7 +56,7 @@ namespace Androdev.Core
 
         public LogManager(string className)
         {
-            _logClass = "(" + className + ")";
+            _logClass = className;
         }
 
         public void Error(string message)
