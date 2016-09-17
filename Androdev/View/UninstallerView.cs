@@ -52,6 +52,7 @@ namespace Androdev.View
         }
         #endregion
 
+        #region Methods
         private void ConfigureWiring()
         {
             cmdInstallationCleaner.Click += _presenter.StartUninstallationEventHandler;
@@ -59,6 +60,16 @@ namespace Androdev.View
             lblProcessedFile.DataBindings.Add("Text", _presenter.Model, "FileName");
             cboDrive.DataBindings.Add("Enabled", _presenter.Model, "CboDrivesEnabled");
         }
-
+        
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                components?.Dispose();
+                _presenter.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }

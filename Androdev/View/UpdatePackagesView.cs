@@ -25,7 +25,7 @@ namespace Androdev.View
 {
     public partial class UpdatePackagesView : Form
     {
-        UpdatePackagesPresenter _presenter;
+        private readonly UpdatePackagesPresenter _presenter;
 
         public UpdatePackagesView()
         {
@@ -35,6 +35,7 @@ namespace Androdev.View
             ConfigureWiring();
         }
 
+        #region Methods
         private void ConfigureWiring()
         {
             cmdCancel.Click += _presenter.CancelButtonClickEventHandler;
@@ -44,6 +45,17 @@ namespace Androdev.View
             lblDownloadSize.DataBindings.Add("Text", _presenter.Model, "DownloadSizeText");
             lblQueue.DataBindings.Add("Text", _presenter.Model, "QueueText");
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                components?.Dispose();
+                _presenter.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+        #endregion
 
         #region Form Events
         private void FrmUpdate_Load(object sender, EventArgs e)
