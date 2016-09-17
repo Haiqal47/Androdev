@@ -14,6 +14,7 @@
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.IO;
+using System.Security.Permissions;
 using Microsoft.Win32;
 
 namespace Androdev.Core.Diagostic
@@ -51,6 +52,7 @@ namespace Androdev.Core.Diagostic
             return exist;
         }
 
+        [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool InstallJavaDevelopmentKit()
         {
             var jdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\jdk-8u101-windows-i586.exe");

@@ -14,6 +14,7 @@
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Diagnostics;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 
@@ -21,6 +22,7 @@ namespace Androdev.Core.Diagostic
 {
     public class ProcessHelper
     {
+        [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool RunAndWait(string filePath, string cmdLine, string ouputTextShouldTrue)
         {
             var shouldContinue = false;
@@ -72,6 +74,7 @@ namespace Androdev.Core.Diagostic
             }
         }
 
+        [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool RunAndWait(string filePath, string cmdLine)
         {
             using (var installerProcess = new Process())

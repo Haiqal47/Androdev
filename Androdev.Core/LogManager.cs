@@ -15,6 +15,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Permissions;
 
 namespace Androdev.Core
 {
@@ -38,6 +39,7 @@ namespace Androdev.Core
             return new LogManager("UNTRACEABLE");
         }
 
+        [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static void ConfigureLogger()
         {
             // configure

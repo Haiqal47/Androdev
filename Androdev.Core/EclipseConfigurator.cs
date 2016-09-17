@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Permissions;
 using System.Text;
 using Androdev.Core.Diagostic;
 using Androdev.Core.IO;
@@ -111,11 +112,13 @@ namespace Androdev.Core
         }
         #endregion
 
+        [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public bool InitializeEclipseConfiguration()
         {
             return ProcessHelper.RunAndWait(_eclipseCommandLinePath, EclipsePrepareConfigArguments);
         }
 
+        [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public bool InstallAdt(string adtPackagePath)
         {
             return ProcessHelper.RunAndWait(_eclipseCommandLinePath, BuildAdtInstallArgument(adtPackagePath), EclipsecSuccess);
