@@ -137,9 +137,6 @@
     <None Include="Resources\logoApp.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\checked.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="iconApp.ico" />
   </ItemGroup>
   <ItemGroup>
