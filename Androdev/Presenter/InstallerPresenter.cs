@@ -13,30 +13,27 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using Androdev.Core;
-using Androdev.Core.Diagostic;
 using Androdev.Localization;
 using Androdev.Model;
 using Androdev.View;
 using Androdev.View.Dialogs;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Androdev.Presenter
 {
-    public class InstallerPresenter
+    public class InstallerPresenter : IDisposable
     {
-        private static readonly LogManager _logManager = LogManager.GetClassLogger();
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
         private readonly InstallerModel _model;
         private readonly InstallerView _view;
+
+        private readonly InstallManager _installManager;
 
         public InstallerModel Model
         {
             get { return _model; }
         }
-
-        private readonly InstallManager _installManager;
 
         public InstallerPresenter(InstallerView view)
         {
@@ -151,7 +148,7 @@ namespace Androdev.Presenter
                 catch (Exception ex)
                 {
                     MessageBox.Show(TextResource.CantChangeConfigText, TextResource.CantChangeConfigTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    _logManager.Error("Unable to change install config.", ex);
+                    Logger.Error("Unable to change install config.", ex);
                 }
             }
         }
@@ -170,5 +167,23 @@ namespace Androdev.Presenter
         }
         #endregion
 
+        #region IDisposable Support
+        private bool _disposedValue;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposedValue || !disposing) return;
+            
+            _installManager.Dispose();
+
+            _disposedValue = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
