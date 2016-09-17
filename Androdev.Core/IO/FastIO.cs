@@ -22,9 +22,10 @@ using IWshRuntimeLibrary;
 namespace Androdev.Core.IO
 {
     [SecurityCritical]
-    public class FastIo
+    public static class FastIo
     {
-        internal const string UnicodePrefix = @"\\?\";
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
+        //private const string UnicodePrefix = @"\\?\";
 
         public static IEnumerable<FileData> EnumerateFiles(string path, SearchOption option)
         {
@@ -78,29 +79,39 @@ namespace Androdev.Core.IO
             var dataSource = new List<DriveInfo>();
             for (var i = 0; i < drives.Length; i++)
             {
-                // is ready?
-                if (!drives[i].IsReady) continue;
-                // is NTFS?
-                if (drives[i].DriveFormat != "NTFS") continue;
-                // has more than 2GB free space?
-                if (drives[i].AvailableFreeSpace < 2000) continue;
+                var currentDrive = drives[i];
 
-                dataSource.Add(drives[i]);
+                // is ready?
+                if (!currentDrive.IsReady) continue;
+                // is NTFS?
+                if (currentDrive.DriveFormat != "NTFS") continue;
+                // has more than 2GB free space?
+                if (currentDrive.AvailableFreeSpace < 2000) continue;
+
+                dataSource.Add(currentDrive);
+                Logger.Debug("Found drive: " + currentDrive.Name);
             }
             return dataSource.Count > 0 ? dataSource.ToArray() : null;
         }
 
         public static void CreateShortcut(ShortcutProperties properties)
         {
-            var shortcutLocation = Path.Combine(Commons.GetDesktopPath(), properties.Name + ".lnk");
-            var shell = new WshShell();
-            var shortcut = (IWshShortcut)shell.CreateShortcut(shortcutLocation);
+            try
+            {
+                var shortcutLocation = Path.Combine(Commons.GetDesktopPath(), properties.Name + ".lnk");
+                var shell = new WshShell();
+                var shortcut = (IWshShortcut) shell.CreateShortcut(shortcutLocation);
 
-            if (properties.IconFile != null) shortcut.IconLocation = properties.IconFile;
-            shortcut.Description = properties.Comment;
-            shortcut.TargetPath = properties.Target;
-            
-            shortcut.Save();
+                if (properties.IconFile != null) shortcut.IconLocation = properties.IconFile;
+                shortcut.Description = properties.Comment;
+                shortcut.TargetPath = properties.Target;
+
+                shortcut.Save();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
         }
     }
 }
