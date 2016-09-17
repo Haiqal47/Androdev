@@ -470,12 +470,27 @@ namespace Androdev.Core
             WorkerReportProgress(86, 24, "Installing shortcuts...");
             _logManager.Debug("Installing shortcuts...");
 
-            FastIO.CreateShortcut(Path.Combine(_installDirectory, "android-sdk\\SDK Manager.exe"),
-                                   "Android SDK Tools", "Launch Android SDK Tools.");
-            FastIO.CreateShortcut(Path.Combine(_installDirectory, "eclipse\\eclipse.exe"),
-                                   "Eclipse Mars", "Launch Eclipse Mars IDE for Android.");
-            FastIO.CreateShortcut(Path.Combine(_installDirectory, "workspace"),
-                                    "Eclipse Workspace", "Eclipse workspace directory.");
+            FastIO.CreateShortcut(new ShortcutProperties()
+            {
+                Target = Path.Combine(_installDirectory, "android-sdk\\SDK Manager.exe"),
+                Name = "Android SDK Tools",
+                Comment = "Launch Android SDK Tools.",
+            });
+
+            FastIO.CreateShortcut(new ShortcutProperties()
+            {
+                Target = Path.Combine(_installDirectory, "eclipse\\eclipse.exe"),
+                Name = "Eclipse Mars for Android",
+                Comment = "Launch Eclipse Mars IDE for Android.",
+            });
+
+
+            FastIO.CreateShortcut(new ShortcutProperties()
+            {
+                Target = Path.Combine(_installDirectory, "workspace"),
+                Name = "Eclipse Workspace",
+                Comment = "Eclipse workspace directory.",
+            });
 
             _logManager.Debug("Shortcuts installed.");
             WorkerReportProgress(100, 100, "Shortcuts installed.");

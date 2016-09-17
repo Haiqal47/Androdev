@@ -49,6 +49,7 @@
     <Compile Include="InstallProgressChangedEventArgs.cs" />
     <Compile Include="IO\FastIO.cs" />
     <Compile Include="IO\FileData.cs" />
+    <Compile Include="IO\ShortcutProperties.cs" />
     <Compile Include="LogManager.cs" />
     <Compile Include="Native\NativeMethods.cs" />
     <Compile Include="Native\SafeFindHandle.cs" />

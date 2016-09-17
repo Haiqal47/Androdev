@@ -37,22 +37,26 @@ namespace Androdev.Core.IO
                 throw new ArgumentOutOfRangeException(nameof(option));
             }
             
+            // queue first directory
             var winFindData = new WIN32_FIND_DATA();
             var qDirectories = new Queue<string>();
             qDirectories.Enqueue(Path.GetFullPath(path));
 
             while (qDirectories.Count > 0)
             {
+                // dequeue path
                 var currentPath = qDirectories.Dequeue();
-                var currentSearch = Path.Combine(currentPath, "*");
-                var hndFindFile = NativeMethods.FindFirstFile(currentSearch, winFindData);
+                var hndFindFile = NativeMethods.FindFirstFile(Path.Combine(currentPath, "*"), winFindData);
 
+                // if the handle is invalid, continue to next dir
                 if (hndFindFile.IsInvalid) continue;
                 do
                 {
+                    // found a file
                     var curPath = Path.Combine(currentPath, winFindData.cFileName);
                     if ((winFindData.dwFileAttributes & FileAttributes.Directory) == FileAttributes.Directory)
                     {
+                        // if the file is a Directory and AllDriectiories is selected, enqueue it.
                         if ("." != winFindData.cFileName && ".." != winFindData.cFileName && option == SearchOption.AllDirectories)
                         {
                             qDirectories.Enqueue(curPath);
@@ -60,8 +64,10 @@ namespace Androdev.Core.IO
                     }
                     else
                     {
+                        // it's a file. Return it.
                         yield return new FileData(currentPath, winFindData);
                     }
+                    // find next file
                 } while (NativeMethods.FindNextFile(hndFindFile, winFindData));
             }
         }
@@ -84,15 +90,16 @@ namespace Androdev.Core.IO
             return dataSource.Count > 0 ? dataSource.ToArray() : null;
         }
 
-        public static void CreateShortcut(string targetExe, string shortcutName, string desc, string iconPath = null)
+        public static void CreateShortcut(ShortcutProperties properties)
         {
-            var shortcutLocation = Path.Combine(Commons.GetDesktopPath(), shortcutName + ".lnk");
+            var shortcutLocation = Path.Combine(Commons.GetDesktopPath(), properties.Name + ".lnk");
             var shell = new WshShell();
             var shortcut = (IWshShortcut)shell.CreateShortcut(shortcutLocation);
 
-            shortcut.Description = desc;
-            if (iconPath != null) shortcut.IconLocation = iconPath;
-            shortcut.TargetPath = targetExe;
+            if (properties.IconFile != null) shortcut.IconLocation = properties.IconFile;
+            shortcut.Description = properties.Comment;
+            shortcut.TargetPath = properties.Target;
+            
             shortcut.Save();
         }
     }

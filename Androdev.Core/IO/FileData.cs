@@ -23,29 +23,31 @@ namespace Androdev.Core.IO
     [Serializable]
     public class FileData
     {
-        public readonly FileAttributes Attributes;
+        #region Properties
+        public FileAttributes Attributes { get; }
 
         public DateTime CreationTime => this.CreationTimeUtc.ToLocalTime();
 
-        public readonly DateTime CreationTimeUtc;
+        public DateTime CreationTimeUtc { get; }
 
-        public DateTime LastAccesTime => this.LastAccessTimeUtc.ToLocalTime();
+        public DateTime LastAccesTime => LastAccessTimeUtc.ToLocalTime();
 
-        public readonly DateTime LastAccessTimeUtc;
+        public DateTime LastAccessTimeUtc { get; }
 
-        public DateTime LastWriteTime => this.LastWriteTimeUtc.ToLocalTime();
+        public DateTime LastWriteTime => LastWriteTimeUtc.ToLocalTime();
 
-        public readonly DateTime LastWriteTimeUtc;
+        public DateTime LastWriteTimeUtc { get; }
 
-        public readonly long Size;
+        public long Size { get; }
 
-        public readonly string Name;
+        public string Name { get; }
 
-        public readonly string FullPath;
+        public string FullPath { get; }
+        #endregion
 
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
         internal FileData(string dir, WIN32_FIND_DATA findData)
@@ -56,7 +58,7 @@ namespace Androdev.Core.IO
             this.LastWriteTimeUtc = ConvertDateTime(findData.ftLastWriteTime_dwHighDateTime, findData.ftLastWriteTime_dwLowDateTime);
             this.Size = CombineHighLowInts(findData.nFileSizeHigh, findData.nFileSizeLow);
             this.Name = findData.cFileName;
-            this.FullPath = System.IO.Path.Combine(dir, findData.cFileName).TrimEnd(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            this.FullPath = Path.Combine(dir, findData.cFileName).TrimEnd(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
         }
 
         private static long CombineHighLowInts(uint high, uint low)
