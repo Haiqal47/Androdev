@@ -191,10 +191,12 @@ namespace Androdev.Presenter
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposedValue && disposing) return;
+            if (!_disposedValue) return;
+            if (disposing)
+            {
+                _installManager?.Dispose();
+            }
             
-            _installManager?.Dispose();
-
             _disposedValue = true;
         }
 
