@@ -53,18 +53,18 @@ namespace Androdev.Presenter
         {
             UpdateSetupButton(1, true);
             _model.LoadingAnimationVisible = true;
-            ResetUi();
+            ResetProgressBars();
         }
 
         private void InstallManager_InstallProgressChanged(object sender, InstallProgressChangedEventArgs e)
         {
             var invoker = new Action<InstallProgressChangedEventArgs>(args =>
             {
-                _model.ProgressStyle = (e.CurrentProgressPercentage == 99 ? ProgressBarStyle.Marquee : ProgressBarStyle.Blocks);
-                _model.CurrentProgressPercentage = e.CurrentProgressPercentage;
-                _model.OverallProgressPercentage = e.OverallProgressPercentage;
-                _model.StatusText = e.StatusText;
-                _model.DescriptionText = e.ExtraStatusText;
+                _model.ProgressStyle = (args.CurrentProgressPercentage == 99 ? ProgressBarStyle.Marquee : ProgressBarStyle.Blocks);
+                _model.CurrentProgressPercentage = args.CurrentProgressPercentage;
+                _model.OverallProgressPercentage = args.OverallProgressPercentage;
+                _model.StatusText = args.StatusText;
+                _model.DescriptionText = args.ExtraStatusText;
             });
             _view.Invoke(invoker, e);
         }
@@ -73,15 +73,14 @@ namespace Androdev.Presenter
         {
             UpdateSetupButton(0, true);
             _model.LoadingAnimationVisible = false;
-            ResetUi();
+            ResetProgressBars();
         }
         #endregion
 
         #region Methods
-        private void ResetUi()
+        private void ResetProgressBars()
         {
             _model.CurrentProgressPercentage = 0;
-            _model.DescriptionText = "";
             _model.OverallProgressPercentage = 0;
             _model.ProgressStyle = ProgressBarStyle.Blocks;
         }

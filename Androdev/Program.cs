@@ -15,6 +15,7 @@
 using System;
 using System.Windows.Forms;
 using Androdev.Core;
+using Androdev.Localization;
 using Androdev.View;
 
 namespace Androdev
@@ -34,6 +35,7 @@ namespace Androdev
 
             if (args.Length > 0 && args[0] == "/uninstall")
             {
+                MessageBox.Show(TextResource.UninstallerWarningText, TextResource.UninstallConfirmationTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Application.Run(new UninstallerView());
             }
             else

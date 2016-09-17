@@ -171,6 +171,16 @@ namespace Androdev.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are running uninstaller for Androdev. This installer is still in BETA.
+        ///Manual uninstallation is preffered..
+        /// </summary>
+        internal static string UninstallerWarningText {
+            get {
+                return ResourceManager.GetString("UninstallerWarningText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to update? This action will REMOVE all existing packages and download a new one.
         ///This action cannot be undone..
         /// </summary>

@@ -162,4 +162,8 @@ This action cannot be undone.</value>
   <data name="UpdateConfirmationTitle" xml:space="preserve">
     <value>Update packages?</value>
   </data>
+  <data name="UninstallerWarningText" xml:space="preserve">
+    <value>You are running uninstaller for Androdev. This installer is still in BETA.
+Manual uninstallation is preffered.</value>
+  </data>
 </root>
