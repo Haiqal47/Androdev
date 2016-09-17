@@ -15,14 +15,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using Androdev.Core.Diagostic;
+using System.Security;
 using Androdev.Core.Native;
 using IWshRuntimeLibrary;
 
 namespace Androdev.Core.IO
 {
-    public class FastIO
+    [SecurityCritical]
+    public class FastIo
     {
         internal const string UnicodePrefix = @"\\?\";
 

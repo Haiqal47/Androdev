@@ -46,7 +46,7 @@ namespace Androdev.Presenter
             _view = view;
             _model = new UninstallerModel();
 
-            var dataSource = FastIO.GetAvailiableDrives();
+            var dataSource = FastIo.GetAvailiableDrives();
             _view.DrivesDataSource = dataSource;
             for (int i = 0; i < dataSource.Length; i++)
             {
@@ -80,7 +80,7 @@ namespace Androdev.Presenter
             try
             {
                 var deletePath = Path.Combine(e.Argument.ToString(), "Androdev");
-                using (var enumer = FastIO.EnumerateFiles(deletePath, SearchOption.AllDirectories).GetEnumerator())
+                using (var enumer = FastIo.EnumerateFiles(deletePath, SearchOption.AllDirectories).GetEnumerator())
                 {
                     while (enumer.MoveNext())
                     {

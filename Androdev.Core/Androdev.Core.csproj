@@ -47,7 +47,7 @@
     <Compile Include="EclipseConfigurator.cs" />
     <Compile Include="InstallManager.cs" />
     <Compile Include="InstallProgressChangedEventArgs.cs" />
-    <Compile Include="IO\FastIO.cs" />
+    <Compile Include="IO\FastIo.cs" />
     <Compile Include="IO\FileData.cs" />
     <Compile Include="IO\ShortcutProperties.cs" />
     <Compile Include="LogManager.cs" />

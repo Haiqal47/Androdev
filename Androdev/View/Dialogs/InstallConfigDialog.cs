@@ -71,7 +71,7 @@ namespace Androdev.View.Dialogs
 
         private void FrmInstallConfig_Shown(object sender, EventArgs e)
         {
-            var dataSource = FastIO.GetAvailiableDrives();
+            var dataSource = FastIo.GetAvailiableDrives();
 
             chkUAC.Checked = UacCompatibility;
             cboInstallDir.DataSource = dataSource;

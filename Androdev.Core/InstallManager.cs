@@ -78,7 +78,7 @@ namespace Androdev.Core
             _logManager.Debug("System disk: " + systemDisk);
 
             var installDrive = systemDisk;
-            var drives = FastIO.GetAvailiableDrives();
+            var drives = FastIo.GetAvailiableDrives();
             for (var i = 0; i < drives.Length; i++)
             {
                 _logManager.Debug("Found drive: " + drives[i].Name);
@@ -470,21 +470,21 @@ namespace Androdev.Core
             WorkerReportProgress(86, 24, "Installing shortcuts...");
             _logManager.Debug("Installing shortcuts...");
 
-            FastIO.CreateShortcut(new ShortcutProperties()
+            FastIo.CreateShortcut(new ShortcutProperties()
             {
                 Target = Path.Combine(_installDirectory, "android-sdk\\SDK Manager.exe"),
                 Name = "Android SDK Tools",
                 Comment = "Launch Android SDK Tools.",
             });
 
-            FastIO.CreateShortcut(new ShortcutProperties()
+            FastIo.CreateShortcut(new ShortcutProperties()
             {
                 Target = Path.Combine(_installDirectory, "eclipse\\eclipse.exe"),
                 Name = "Eclipse Mars for Android",
                 Comment = "Launch Eclipse Mars IDE for Android.",
             });
             
-            FastIO.CreateShortcut(new ShortcutProperties()
+            FastIo.CreateShortcut(new ShortcutProperties()
             {
                 Target = Path.Combine(_installDirectory, "workspace"),
                 Name = "Eclipse Workspace",
