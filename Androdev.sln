@@ -16,24 +16,42 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.MD = README.MD
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Androdev.Tests", "Androdev.Tests\Androdev.Tests.csproj", "{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF4914E5-5CC0-4E4F-8F22-319904376876}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{FF4914E5-5CC0-4E4F-8F22-319904376876}.Debug|x86.ActiveCfg = Debug|x86
 		{FF4914E5-5CC0-4E4F-8F22-319904376876}.Debug|x86.Build.0 = Debug|x86
+		{FF4914E5-5CC0-4E4F-8F22-319904376876}.Release|Any CPU.ActiveCfg = Release|x86
 		{FF4914E5-5CC0-4E4F-8F22-319904376876}.Release|x86.ActiveCfg = Release|x86
 		{FF4914E5-5CC0-4E4F-8F22-319904376876}.Release|x86.Build.0 = Release|x86
+		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Debug|x86.ActiveCfg = Debug|x86
 		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Debug|x86.Build.0 = Debug|x86
+		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Release|Any CPU.ActiveCfg = Release|x86
 		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Release|x86.ActiveCfg = Release|x86
 		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Release|x86.Build.0 = Release|x86
+		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Debug|x86.ActiveCfg = Debug|x86
 		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Debug|x86.Build.0 = Debug|x86
+		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Release|Any CPU.ActiveCfg = Release|x86
 		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Release|x86.ActiveCfg = Release|x86
 		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Release|x86.Build.0 = Release|x86
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Debug|x86.Build.0 = Debug|Any CPU
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Release|x86.ActiveCfg = Release|Any CPU
+		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
