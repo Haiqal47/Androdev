@@ -55,7 +55,6 @@
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmdOpenLog = new System.Windows.Forms.ToolStripButton();
             this.cmdSend = new System.Windows.Forms.ToolStripButton();
-            this.cmdEnvironVar = new System.Windows.Forms.ToolStripButton();
             this.cmdAbout = new System.Windows.Forms.ToolStripButton();
             this.cmdSdkManager = new System.Windows.Forms.ToolStripButton();
             this.cmdAdbTerminal = new System.Windows.Forms.ToolStripButton();
@@ -74,7 +73,6 @@
             this.cmdOpenLog,
             this.cmdSend,
             this.toolStripSeparator2,
-            this.cmdEnvironVar,
             this.cmdAbout,
             this.cmdSdkManager,
             this.cmdAdbTerminal});
@@ -324,15 +322,6 @@
             this.cmdSend.Text = "Send log";
             this.cmdSend.Click += new System.EventHandler(this.cmdSend_Click);
             // 
-            // cmdEnvironVar
-            // 
-            this.cmdEnvironVar.Image = ((System.Drawing.Image)(resources.GetObject("cmdEnvironVar.Image")));
-            this.cmdEnvironVar.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.cmdEnvironVar.Name = "cmdEnvironVar";
-            this.cmdEnvironVar.Size = new System.Drawing.Size(117, 22);
-            this.cmdEnvironVar.Text = "Environment var.";
-            this.cmdEnvironVar.Click += new System.EventHandler(this.cmdEnvironVar_Click);
-            // 
             // cmdAbout
             // 
             this.cmdAbout.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -396,7 +385,6 @@
         private System.Windows.Forms.ToolStripButton cmdOpenLog;
         private System.Windows.Forms.ToolStripButton cmdSend;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripButton cmdEnvironVar;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private ListViewEx listViewEx1;
         private System.Windows.Forms.ColumnHeader columnHeader1;

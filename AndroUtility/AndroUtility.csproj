@@ -35,11 +35,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FrmAbout.cs">
@@ -92,14 +89,17 @@
     <None Include="Resources\mail--arrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\application-list.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="androutility.ico" />
     <None Include="Resources\adb.png" />
     <None Include="Resources\android.png" />
     <None Include="Resources\Tools-icon.png" />
     <None Include="Resources\information-button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Androdev.Core\Androdev.Core.csproj">
+      <Project>{fb18ce3d-a06b-4450-b8f7-1565531c4290}</Project>
+      <Name>Androdev.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

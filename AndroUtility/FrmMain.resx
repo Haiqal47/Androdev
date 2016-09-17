@@ -120,26 +120,13 @@
   <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>25, 19</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="cmdEnvironVar.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGMSURBVDhPpZPBa4FhHMef3FbKbYcdd3HWDi5uTsoBcdDu
-        bGut1moOO++PWElKSSMRSSTFeK2ZKNqUk0SRKIpE373ft2g7vvOrT9+n5/d86tfT84ijy+FwnLtcLreM
-        RyVuusJut19Wq9V2r9dDt/uNTqeDVquJer2OWq0GuYdKhbzL609IUgsfH1/IZt/adIXNZrvO5/PI5XLy
-        ZhaZTAapVAqJRALxeBzRaBSRSAThcBihUAjBYBCBQAB+vx8ajcYjnE6nF/8supzgarfb4eL1HNvtFuVy
-        WRl/D6djDgYDpb+HDl1htVpvNpsN1uu1KujQFRaL5Xa1WqF0f4flcqncgSRJB4rF4p8kzWYTdOgKs9l8
-        t1gsMJvNVEGHrjCZTPfz+RyeF2AymaBUKiGZTCr5e91oNJT+Hjp0hdFofJhOpxgOh6qgQ1cYDIbH8XgM
-        n8+Hfr+PWCwmP5qKkoVC4UA6nVaSZwgdukKv1z9xpNFopAo6dIVWq/XqdLrn/0CX/+lE5lTmTCV06B5T
-        QvwAxnxfi7HKRZMAAAAASUVORK5CYII=
-</value>
-  </data>
   <metadata name="statusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>130, 19</value>
   </metadata>
   <metadata name="bwReader.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>246, 19</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAkAAAAAAAEAIABChgAAlgAAAICAAAABACAAKAgBANiGAABgYAAAAQAgAKiUAAAAjwEASEgAAAEA

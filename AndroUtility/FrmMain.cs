@@ -2,19 +2,38 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Androdev.Core.Diagostic;
+using Androdev.Core.IO;
 
 namespace AndroUtility
 {
     public partial class FrmMain : Form
     {
+        private readonly string _androidSdkPath = "";
+
         public FrmMain()
         {
             InitializeComponent();
+
+            // find Androdev installation
+            var drives = FastIo.GetAvailiableDrives();
+            for (int i = 0; i < drives.Length; i++)
+            {
+                var currentDrive = drives[i].Name;
+                if (!InstallationHelpers.IsAndrodevDirectoryExist(currentDrive)) continue;
+
+                _androidSdkPath = Path.Combine(currentDrive, "Androdev\\android-sdk");
+                if (Directory.Exists(_androidSdkPath))
+                {
+                    break;
+                }
+            }
         }
 
         #region BackgroundWorker
@@ -125,20 +144,29 @@ namespace AndroUtility
                 "Glad if you want to tell us about our application!",
                 "Send log file.", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-        private void cmdEnvironVar_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        
         private void cmdSdkManager_Click(object sender, EventArgs e)
         {
-
+            var sdkPath = Path.Combine(_androidSdkPath, "SDK Manager.exe");
+            if (File.Exists(sdkPath))
+            {
+                Process.Start(sdkPath);
+                MessageBox.Show("Launching Android SDK Manager might take a while. Please be patient.",
+                    "Launching SDK Manager", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void cmdAdbTerminal_Click(object sender, EventArgs e)
         {
-
+            var adbPath = Path.Combine(_androidSdkPath, "platform-tools");
+            if (Directory.Exists(adbPath))
+            {
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    WorkingDirectory = adbPath,
+                });
+            }
         }
 
         private void cmdAbout_Click(object sender, EventArgs e)
