@@ -12,9 +12,6 @@
 // 
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Androdev.Core
 {
@@ -27,21 +24,14 @@ namespace Androdev.Core
 
         public static string GetUrlByIndex(int index)
         {
-            if (index != 0)
+            switch (index)
             {
-                if (index == 1)
-                {
+                case 1:
                     return JavaDevelopmentKit;
-                }
-                if (index == 2)
-                {
+                case 2:
                     return AndroidDeveloperTools;
-                }
-                if (index == 3)
-                {
+                case 3:
                     return EclipseMars2;
-                }
-                return AndroidSdkTools;
             }
             return AndroidSdkTools;
         }

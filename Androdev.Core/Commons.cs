@@ -73,7 +73,9 @@ namespace Androdev.Core
         public static string GetFilenameFromUri(Uri uriPath)
         {
             var relativePath = uriPath.AbsolutePath;
-            var newpath = relativePath.Substring(relativePath.LastIndexOf("/", StringComparison.Ordinal) + 1);
+            var lastIndex = relativePath.LastIndexOf("/", StringComparison.Ordinal);
+            var newpath = relativePath.Substring(lastIndex + 1);
+
             return newpath;
         }
 
