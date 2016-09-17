@@ -25,7 +25,7 @@ namespace Androdev.Core
 {
     public class InstallManager : IDisposable
     {
-        private readonly LogManager _logManager = LogManager.GetClassLogger();
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
 
         private string _installDirectory;
         private bool _uacCompatibility;
@@ -36,15 +36,12 @@ namespace Androdev.Core
 
         public InstallManager()
         {
-            _logManager.Debug("InstallManager is constructing...");
             UseAutomatedConfig();
 
             // configure BGW
             _bwWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
             _bwWorker.DoWork += BwWorker_DoWork;
             _bwWorker.RunWorkerCompleted += BwWorker_RunWorkerCompleted;
-
-            _logManager.Debug("InstallManager constructed.");
         }
 
         #region Properties
@@ -75,20 +72,20 @@ namespace Androdev.Core
         {
             // find instal directory
             var systemDisk = Path.GetPathRoot(Environment.SystemDirectory);
-            _logManager.Debug("System disk: " + systemDisk);
+            Logger.Debug("System disk: " + systemDisk);
 
             var installDrive = systemDisk;
             var drives = FastIo.GetAvailiableDrives();
             for (var i = 0; i < drives.Length; i++)
             {
-                _logManager.Debug("Found drive: " + drives[i].Name);
+                Logger.Debug("Found drive: " + drives[i].Name);
 
                 // is system disk?
                 if (systemDisk.StartsWith(drives[i].Name)) continue;
 
                 // the choosen one
                 installDrive = drives[i].Name;
-                _logManager.Info("Androdev install location selected. Drive " + installDrive);
+                Logger.Info("Androdev install location selected. Drive " + installDrive);
                 break;
             }
 
@@ -102,18 +99,17 @@ namespace Androdev.Core
         {
             if (string.IsNullOrEmpty(driveRoot))
             {
-                _logManager.Debug("Null object passed to InstallDirectory.");
                 throw new ArgumentException("Argument is null or empty", nameof(driveRoot));
             }
 
             _installDirectory = Path.Combine(driveRoot, "Androdev");
-            _logManager.Debug("Changed install path to " + _installDirectory);
+            Logger.Debug("Changed install path to " + _installDirectory);
         }
 
         public void SetUacCompatibility(bool enabled)
         {
             _uacCompatibility = enabled;
-            _logManager.Debug("UAC Compatibility state: " + _uacCompatibility.ToString());
+            Logger.Debug("UAC Compatibility state: " + _uacCompatibility.ToString());
         }
         #endregion
 
@@ -122,22 +118,19 @@ namespace Androdev.Core
         {
             if (_bwWorker.IsBusy)
             {
-                _logManager.Debug("BackgroundWorker is busy.");
                 throw new InvalidOperationException("Thread is busy!");
             }
 
             InstallStarted?.Invoke(this, EventArgs.Empty);
             _bwWorker.RunWorkerAsync();
-            _logManager.Debug("Install process started.");
+            Logger.Debug("Install process started.");
         }
 
         public void EndInstall()
         {
-            if (_bwWorker.IsBusy)
-            {
-                _logManager.Debug("Stopping install process.");
-                _bwWorker.CancelAsync();
-            }
+            if (!_bwWorker.IsBusy) return;
+            Logger.Debug("Stopping install process.");
+            _bwWorker.CancelAsync();
         }
         #endregion
 
@@ -177,75 +170,114 @@ namespace Androdev.Core
             }
 
             // step 1 - install JDK
-            _logManager.Info("==========Java Development Kit [Started]===========");
+            Logger.Info("==========Java Development Kit [Started]===========");
             InstallJdk();
-            _logManager.Info("==========Java Development Kit [Finished]===========");
+            Logger.Info("==========Java Development Kit [Finished]===========");
 
             if (_bwWorker.CancellationPending) return; // cancellation boundary
 
             // step 2 - config PATH
-            _logManager.Info("==========Configuring Envirnment Variables [Started]===========");
+            Logger.Info("==========Configuring Envirnment Variables [Started]===========");
             ConfigurePathEnvironment();
-            _logManager.Info("==========Configuring Envirnment Variables [Finished]===========");
+            Logger.Info("==========Configuring Envirnment Variables [Finished]===========");
 
             if (_bwWorker.CancellationPending) return; // cancellation boundary
 
             // step 3 - install Android SDK
-            _logManager.Info("==========Android SDK Tools [Started]===========");
+            Logger.Info("==========Android SDK Tools [Started]===========");
             InstallAndroidSdk();
-            _logManager.Info("==========Android SDK Tools [Finished]===========");
+            Logger.Info("==========Android SDK Tools [Finished]===========");
 
             if (_bwWorker.CancellationPending) return; // cancellation boundary
 
             // step 4 - install Eclipse IDE
-            _logManager.Info("==========Eclipse Mars 2 IDE [Started]===========");
+            Logger.Info("==========Eclipse Mars 2 IDE [Started]===========");
             InstallEclipseIde();
-            _logManager.Info("==========Eclipse Mars 2 IDE [Finished]===========");
+            Logger.Info("==========Eclipse Mars 2 IDE [Finished]===========");
 
             // add manifest if necessary
             if (_uacCompatibility)
             {
-                _logManager.Info("==========UAC Elevation Manifest [Started]===========");
+                Logger.Info("==========UAC Elevation Manifest [Started]===========");
                 InstallManifests();
-                _logManager.Info("==========UAC Elevation Manifest [Finished]===========");
+                Logger.Info("==========UAC Elevation Manifest [Finished]===========");
             }
 
             if (_bwWorker.CancellationPending) return; // cancellation boundary
 
             // step 5 - install ADT
-            _logManager.Info("==========Android Developer Tools Plugin [Started]===========");
+            Logger.Info("==========Android Developer Tools Plugin [Started]===========");
             InstallAdt();
-            _logManager.Info("==========Android Developer Tools Plugin [Finished]===========");
+            Logger.Info("==========Android Developer Tools Plugin [Finished]===========");
 
             if (_bwWorker.CancellationPending) return; // cancellation boundary
 
             // step 6 - configure Eclipse
-            _logManager.Info("==========Configure Eclipse IDE for First Time [Started]===========");
+            Logger.Info("==========Configure Eclipse IDE for First Time [Started]===========");
             ConfigureEclipse();
-            _logManager.Info("==========Configure Eclipse IDE for First Time [Finished]===========");
+            Logger.Info("==========Configure Eclipse IDE for First Time [Finished]===========");
 
             // step 7 - create shortcuts
-            _logManager.Info("==========Install Shortcuts on Desktop [Started]===========");
+            Logger.Info("==========Install Shortcuts on Desktop [Started]===========");
             InstallShortcuts();
-            _logManager.Info("==========Install Shortcuts on Desktop [Finished]===========");
+            Logger.Info("==========Install Shortcuts on Desktop [Finished]===========");
+        }
+        #endregion
+
+        #region Methods
+        private void EclipseIdePostInstallation()
+        {
+            Logger.Debug("Eclipse IDE Post-Install action...");
+            WorkerReportProgress(50, 99, "Eclipse IDE Post-Install action...");
+
+            // configure Eclipse
+            var workspaceDirectory = Path.Combine(_installDirectory, "workspace");
+            var eclipseInstallPath = Path.Combine(_installDirectory, "eclipse");
+            var eclipseConfigService = new EclipseConfigurator(eclipseInstallPath, workspaceDirectory);
+
+            // initialize Eclipse configuration
+            if (!eclipseConfigService.InitializeEclipseConfiguration())
+            {
+                Logger.Error("Cannot initialize Eclipse configuration.");
+                WorkerReportProgress(0, 0, "Cannot initialize Eclipse configuration.");
+                _bwWorker.CancelAsync();
+                return;
+            }
+
+            // configure workspace path
+            Directory.CreateDirectory(workspaceDirectory);
+            if (eclipseConfigService.ConfigureWorkspaceDirectory())
+            {
+                Logger.Error("Cannto change Eclipse Workspace directory.");
+                WorkerReportProgress(0, 0, "Cannot change Eclipse Workspace directory.");
+                _bwWorker.CancelAsync();
+                return;
+            }
+
+            Logger.Debug("Workspace directory created and has been set to Eclipse configuration.");
+            WorkerReportProgress(54, 99, "Eclipse IDE Post-Action completed.");
         }
         #endregion
 
         #region Core Installation Features
         private void InstallJdk()
         {
+
+            // check if JDK is already installed
             if (InstallationHelpers.GetJavaInstallationPath() != null)
             {
                 WorkerReportProgress(14, 100, "Installing JDK 8u101...", "JDK already installed.");
+                Logger.Debug("JDK is already installed.");
                 return;
             }
 
             WorkerReportProgress(7, 99, "Installing JDK 8u101...", "Executing Windows Installer...");
             
+            // install JDK
             if (!InstallationHelpers.InstallJavaDevelopmentKit())
             {
+                WorkerReportProgress(0, 0, "JDK 8u101 cannot be installed.", "Installation timeout.");
                 _bwWorker.CancelAsync();
-                WorkerReportProgress(14, 100, "JDK 8u101 cannot be installed.", "Installation timeout.");
                 return;
             }
 
@@ -254,25 +286,27 @@ namespace Androdev.Core
 
         private void ConfigurePathEnvironment()
         {
-            WorkerReportProgress(14, 50, "Configuring environment variables...");
+            WorkerReportProgress(14, 99, "Configuring environment variables...");
 
             // find Java install path
             var javaHome = InstallationHelpers.GetJavaInstallationPath();
             var javaBinaries = Path.Combine(javaHome, "bin");
+
+            // check if Java is successfully installed
             if (javaHome == null)
             {
-                _logManager.Debug("Java home directory not found.");
+                Logger.Debug("Java home directory not found.");
+                WorkerReportProgress(0, 0, "Java installation directory not found!");
                 _bwWorker.CancelAsync();
-                WorkerReportProgress(14, 58, "Java installation directory not found!");
                 return;
             }
-            _logManager.Debug("Java home directory founded: " + javaHome);
+            Logger.Debug("Java home directory founded: " + javaHome);
 
             try
             {
                 // set JAVA_HOME
                 Environment.SetEnvironmentVariable("JAVA_HOME", javaHome, EnvironmentVariableTarget.User);
-                _logManager.Debug("Environment variable set: JAVA_HOME to " + javaHome);
+                Logger.Debug("Environment variable set: JAVA_HOME to " + javaHome);
 
                 // set Java binaries in Path
                 var initialPath = Environment.GetEnvironmentVariable("Path");
@@ -280,15 +314,15 @@ namespace Androdev.Core
               
                 var newPath = initialPath + ";" + javaBinaries;
                 Environment.SetEnvironmentVariable("Path", newPath, EnvironmentVariableTarget.Machine);
-                _logManager.Debug("Environment variable set: added " + Path.Combine(javaHome, "bin") + " to PATH variable.");
 
+                Logger.Debug("Environment variable set: added " + Path.Combine(javaHome, "bin") + " to PATH variable.");
                 WorkerReportProgress(28, 100, "Environment variables updated.");
             }
             catch (Exception ex)
             {
+                Logger.Error(ex);
+                WorkerReportProgress(0, 0, "Cannot update environment variables.");
                 _bwWorker.CancelAsync();
-                _logManager.Error("Cannot configure environment variables.", ex);
-                WorkerReportProgress(28, 89, "Cannot update environment variables.");
             }
         }
 
@@ -299,9 +333,11 @@ namespace Androdev.Core
             // define zip source
             var extractPath = Path.Combine(_installDirectory, "android-sdk");
             var zipSource = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\android-sdk.zip");
+
+            // create directory and set count to 0
             Directory.CreateDirectory(extractPath);
             Interlocked.Exchange(ref _extractedFile, 0);
-            _logManager.Debug("Android SDK will extracted to: " + extractPath);
+            Logger.Debug("Android SDK will extracted to: " + extractPath);
 
             // define event subscriber
             FastZipEvents zipEvents = new FastZipEvents();
@@ -313,21 +349,30 @@ namespace Androdev.Core
 
                 // use Interlocked as atomic operation
                 Interlocked.Increment(ref _extractedFile);
-                var currentProgress = Interlocked.CompareExchange(ref _extractedFile, 0, 0) / 77508D * 100;
-                var overallProgress = currentProgress / 100 * 12;
+                var currentProgress = Interlocked.CompareExchange(ref _extractedFile, 0, 0) / InstallationHelpers.AndroidSdkFileCount * 100;
+                var overallProgress = (currentProgress / 100 * 12) + 24;
 
                 // report progress
-                WorkerReportProgress(Convert.ToInt32(overallProgress) + 24, Convert.ToInt32(currentProgress),
+                WorkerReportProgress(Convert.ToInt32(overallProgress), Convert.ToInt32(currentProgress),
                     "Installing Android SDK Tools...", "Extracting: " + Commons.ElipsisText(Path.GetFileName(args.Name)));
             };
  
-            // extract files
-            _logManager.Debug("Extracting Android SDK Tools...");
+            try
+            {
+                // extract files
+                Logger.Debug("Extracting Android SDK Tools...");
 
-            FastZip androidZip = new FastZip(zipEvents);
-            androidZip.ExtractZip(zipSource, extractPath, FastZip.Overwrite.Always, name => true, null, null, true);
+                FastZip androidZip = new FastZip(zipEvents);
+                androidZip.ExtractZip(zipSource, extractPath, FastZip.Overwrite.Always, name => true, null, null, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                WorkerReportProgress(0, 0, "Android SDK Tools cannot be installed.");
+                _bwWorker.CancelAsync();
+            }
 
-            _logManager.Debug("Android SDK Tools installed.");
+            Logger.Debug("Android SDK Tools installed.");
             WorkerReportProgress(42, 100, "Android SDK Tools installed.");
         }
 
@@ -338,13 +383,15 @@ namespace Androdev.Core
             // define zip source
             var zipSource = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\eclipse-java-mars-2-win32.zip");
             var zipDestination = Path.Combine(_installDirectory, "eclipse");
-            _logManager.Debug("Eclipse IDE will extracted to: " + zipDestination);
-            Interlocked.Exchange(ref _extractedFile, 0);
+
+            // create output dir and set count to 0
             Directory.CreateDirectory(zipDestination);
+            Interlocked.Exchange(ref _extractedFile, 0);
+            Logger.Debug("Eclipse IDE will extracted to: " + zipDestination);
 
             // define event subscriber
             FastZipEvents zipEvents = new FastZipEvents();
-            zipEvents.ProcessFile += delegate (object sender, ScanEventArgs args)
+            zipEvents.ProcessFile += delegate(object sender, ScanEventArgs args)
             {
                 // check for cancellation
                 args.ContinueRunning = !_bwWorker.CancellationPending;
@@ -352,38 +399,36 @@ namespace Androdev.Core
 
                 // use Interlocked as atomic operation
                 Interlocked.Increment(ref _extractedFile);
-                var currentProgress = Interlocked.CompareExchange(ref _extractedFile, 0, 0) / 1494D * 100;
-                var overallProgress = currentProgress / 100 * 12;
+                var currentProgress = Interlocked.CompareExchange(ref _extractedFile, 0, 0)/InstallationHelpers.EclipseIdeFileCount*100;
+                var overallProgress = currentProgress/100*12;
 
                 // report progress
                 WorkerReportProgress(Convert.ToInt32(overallProgress) + 36, Convert.ToInt32(currentProgress),
                     "Installing Eclipse Mars 2...", "Extracting: " + Commons.ElipsisText(Path.GetFileName(args.Name)));
             };
-            
-            // extract files
-            _logManager.Debug("Extracting Eclipse IDE...");
 
-            FastZip eclipseZip = new FastZip(zipEvents);
-            eclipseZip.ExtractZip(zipSource, _installDirectory, FastZip.Overwrite.Always, name => true, null, null, true);
-
-            _logManager.Debug("Eclipse IDE installed.");
-
-            // configure Eclipse
-            var workspaceDirectory = Path.Combine(_installDirectory, "workspace");
-            var eclipseConfigService = new EclipseConfigurator(Path.Combine(_installDirectory, "eclipse"), workspaceDirectory);
-
-            // initialize Eclipse configuration
-            var initialized = eclipseConfigService.InitializeEclipseConfiguration();
-            if (!initialized)
+            try
             {
-                _bwWorker.CancelAsync();
-                _logManager.Error("Cannot initialize Eclipse configuration.");
-                WorkerReportProgress(68, 60, "Cannot initialize Eclipse configuration.");
-                return;
+                // extract files
+                Logger.Debug("Extracting Eclipse IDE...");
+
+                FastZip eclipseZip = new FastZip(zipEvents);
+                eclipseZip.ExtractZip(zipSource, _installDirectory, FastZip.Overwrite.Always, name => true, null, null,
+                    true);
+
+                Logger.Debug("Eclipse IDE installed.");
             }
-            _logManager.Debug("Eclipse configuration initialized successfully.");
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                WorkerReportProgress(0, 0, "Eclipse IDE cannot be installed.");
+                _bwWorker.CancelAsync();
+            }
 
+            // do post installation
+            EclipseIdePostInstallation();
 
+            Logger.Debug("Eclipse configuration initialized successfully.");
             WorkerReportProgress(56, 100, "Eclipse Mars 2 installed.");
         }
 
@@ -393,19 +438,19 @@ namespace Androdev.Core
 
             // create manifest for SDK Manager
             Manifester.CreateManifestFile(Path.Combine(_installDirectory, "android-sdk\\SDK Manager.exe.manifest"));
-            _logManager.Debug("Manifest added to SDK Manager.");
+            Logger.Debug("Manifest added to SDK Manager.");
 
             // create manifest for AVD Manager
             Manifester.CreateManifestFile(Path.Combine(_installDirectory, "android-sdk\\AVD Manager.exe.manifest"));
-            _logManager.Debug("Manifest added to AVD Manager.");
+            Logger.Debug("Manifest added to AVD Manager.");
 
             // create manifest for Eclipse IDE
             Manifester.CreateManifestFile(Path.Combine(_installDirectory, "eclipse\\eclipse.exe.manifest"));
-            _logManager.Debug("Manifest added to Eclipse IDE.");
+            Logger.Debug("Manifest added to Eclipse IDE.");
 
             // create manifest for Eclipse Command Line
             Manifester.CreateManifestFile(Path.Combine(_installDirectory, "eclipse\\eclipsec.exe.manifest"));
-            _logManager.Debug("Manifest added to Eclipse Command Line.");
+            Logger.Debug("Manifest added to Eclipse Command Line.");
 
             WorkerReportProgress(56, 100, "Manifest installed.");
         }
@@ -416,26 +461,25 @@ namespace Androdev.Core
 
             // configurator service
             var workspaceDirectory = Path.Combine(_installDirectory, "workspace");
-            var eclipseConfigService = new EclipseConfigurator(Path.Combine(_installDirectory, "eclipse"), workspaceDirectory);
-
-            // Eclipse path
             var eclipseInstallPath = Path.Combine(_installDirectory, "eclipse");
+            var eclipseConfigService = new EclipseConfigurator(eclipseInstallPath, workspaceDirectory);
+
+            // locate ADT
             var adtPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\ADT-23.0.7.zip");
-            _logManager.Debug("Eclipse installation path: " + eclipseInstallPath);
-            _logManager.Debug("ADT package path: " + adtPath);
+            Logger.Debug("Eclipse installation path: " + eclipseInstallPath);
+            Logger.Debug("ADT package path: " + adtPath);
             
             // install ADT
             WorkerReportProgress(56, 63, "Installing Android Developer Tools...");
-            var adtInstalled = eclipseConfigService.InstallAdt(adtPath);
-            if (!adtInstalled)
+            if (!eclipseConfigService.InstallAdt(adtPath))
             {
+                WorkerReportProgress(0, 0, "Cannot install Android Developer Tools.");
+                Logger.Error("Cannot install Android Developer Tools.");
                 _bwWorker.CancelAsync();
-                WorkerReportProgress(68, 64, "Cannot install Android Developer Tools.");
-                _logManager.Error("Cannot install Android Developer Tools.");
                 return;
             }
 
-            _logManager.Debug("ADT installed successfully.");
+            Logger.Debug("ADT installed successfully.");
             WorkerReportProgress(70, 100, "Android Developer Tools installed.");
         }
 
@@ -445,29 +489,25 @@ namespace Androdev.Core
 
             // variables
             var workspaceDirectory = Path.Combine(_installDirectory, "workspace");
-            var eclipseConfigService = new EclipseConfigurator(Path.Combine(_installDirectory, "eclipse"), workspaceDirectory);
-
-            // configure workspace path
-            Directory.CreateDirectory(workspaceDirectory);
-            eclipseConfigService.ConfigureWorkspaceDirectory();
-            _logManager.Debug("Workspace directory created and has been set to Eclipse configuration.");
+            var eclipseInstallPath = Path.Combine(_installDirectory, "eclipse");
+            var eclipseConfigService = new EclipseConfigurator(eclipseInstallPath, workspaceDirectory);
 
             // configure SDK path
-              var androidSdkPath = Path.Combine(_installDirectory, "android-sdk");
+            var androidSdkPath = Path.Combine(_installDirectory, "android-sdk");
             eclipseConfigService.ConfigureSdkPath(androidSdkPath);
-            _logManager.Debug("Android SDK path has configured in Eclipse configuration.");
+            Logger.Debug("Android SDK path has configured in Eclipse configuration.");
 
             // configure code assist
             eclipseConfigService.ConfigureCodeAssist();
+            Logger.Debug("Code assist auto-activation has been changed.");
 
-            _logManager.Debug("Code assist auto-activation has been changed.");
             WorkerReportProgress(86, 63, "Configuration completed.");
         }
 
         private void InstallShortcuts()
         {
             WorkerReportProgress(86, 24, "Installing shortcuts...");
-            _logManager.Debug("Installing shortcuts...");
+            Logger.Debug("Installing shortcuts...");
 
             FastIo.CreateShortcut(new ShortcutProperties()
             {
@@ -490,7 +530,7 @@ namespace Androdev.Core
                 Comment = "Eclipse workspace directory.",
             });
 
-            _logManager.Debug("Shortcuts installed.");
+            Logger.Debug("Shortcuts installed.");
             WorkerReportProgress(100, 100, "Shortcuts installed.");
         }
         #endregion
