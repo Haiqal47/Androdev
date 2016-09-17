@@ -13,11 +13,8 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 using Androdev.Core;
 using Androdev.Core.IO;
@@ -30,11 +27,11 @@ namespace Androdev.Presenter
 {
     public class UninstallerPresenter : IDisposable
     {
-        private static readonly LogManager _logManager = LogManager.GetClassLogger();
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
         private readonly UninstallerModel _model;
         private readonly UninstallerView _view;
 
-        private readonly BackgroundWorker bwWorker;
+        private readonly BackgroundWorker _bwWorker;
 
         public UninstallerModel Model
         {
@@ -56,10 +53,10 @@ namespace Androdev.Presenter
                 }
             }
 
-            bwWorker = new BackgroundWorker {WorkerReportsProgress = true};
-            bwWorker.DoWork += BwWorker_DoWork;
-            bwWorker.RunWorkerCompleted += BwWorker_RunWorkerCompleted;
-            bwWorker.ProgressChanged += BwWorker_ProgressChanged;
+            _bwWorker = new BackgroundWorker {WorkerReportsProgress = true};
+            _bwWorker.DoWork += BwWorker_DoWork;
+            _bwWorker.RunWorkerCompleted += BwWorker_RunWorkerCompleted;
+            _bwWorker.ProgressChanged += BwWorker_ProgressChanged;
 
             ConfigureUninstallButtonEventHandler();
         }
@@ -68,6 +65,7 @@ namespace Androdev.Presenter
         private void BwWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             _model.UninstallButtonEnabled = true;
+            _model.CboDrivesEnabled = true;
         }
 
         private void BwWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -86,14 +84,14 @@ namespace Androdev.Presenter
                     {
                         if (enumer.Current == null) continue;
                         File.Delete(enumer.Current.FullPath);
-                        bwWorker.ReportProgress(10, enumer.Current.Name);
+                        _bwWorker.ReportProgress(10, enumer.Current.Name);
                     }
                 }
                 Directory.Delete(deletePath, true);
             }
             catch (Exception ex)
             {
-                _logManager.Error("Exception occured on Uninstall process Thread.", ex);
+                Logger.Error(ex);
             }
         }
         #endregion
@@ -103,33 +101,34 @@ namespace Androdev.Presenter
 
         private void ConfigureUninstallButtonEventHandler()
         {
-            if (MessageBox.Show(TextResource.UninstallConfirmationText, TextResource.UninstallConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
-            {
-                return;
-            }
             if (InstallationHelpers.IsAndrodevDirectoryExist(_view.SelectedDriveName))
             {
+                Logger.Debug("Existing Androdev installation not found.");
                 MessageBox.Show(TextResource.NoExistingInstallationText, TextResource.NoExistingInstallationTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-
-            if (!bwWorker.IsBusy)
+            if (MessageBox.Show(TextResource.UninstallConfirmationText, TextResource.UninstallConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
             {
-                bwWorker.RunWorkerAsync(_view.SelectedDriveName);
-                _model.UninstallButtonEnabled = false;
+                Logger.Debug("User cancelled uninstallation.");
+                return;
             }
+
+            if (_bwWorker.IsBusy) return;
+            Logger.Debug("User started Androdev uninstallation.");
+            _bwWorker.RunWorkerAsync(_view.SelectedDriveName);
+            _model.UninstallButtonEnabled = false;
         }
         #endregion
 
         #region IDisposable Support
-        private bool _disposedValue = false; // To detect redundant calls
+        private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
             if (_disposedValue) return;
             if (disposing)
             {
-                bwWorker?.Dispose();
+                _bwWorker?.Dispose();
             }
 
             _disposedValue = true;
