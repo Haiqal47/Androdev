@@ -20,11 +20,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Androdev.Core")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Core features to support Androdev.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("Androdev.Core")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
+[assembly: AssemblyCompany("KIRSmartCyber")]
+[assembly: AssemblyProduct("Androdev")]
+[assembly: AssemblyCopyright("Copyright © KIRSmartCyber 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Androdev.Tests")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Provides unit tests for Androdev.Core.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("Androdev.Tests")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
+[assembly: AssemblyCompany("KIRSmartCyber")]
+[assembly: AssemblyProduct("Androdev")]
+[assembly: AssemblyCopyright("Copyright © KIRSmartCyber 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
