@@ -241,9 +241,8 @@ namespace Androdev.Core
             }
 
             WorkerReportProgress(7, 99, "Installing JDK 8u101...", "Executing Windows Installer...");
-
-            var jdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\jdk-8u101-windows-i586.exe");
-            if (!ProcessHelper.RunAndWait(jdkPath, InstallationHelpers.JdkInstallArguments))
+            
+            if (!InstallationHelpers.InstallJavaDevelopmentKit())
             {
                 _bwWorker.CancelAsync();
                 WorkerReportProgress(14, 100, "JDK 8u101 cannot be installed.", "Installation timeout.");

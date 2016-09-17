@@ -23,7 +23,7 @@ namespace Androdev.Core.Diagostic
     {
         public static bool RunAndWait(string filePath, string cmdLine, string ouputTextShouldTrue)
         {
-            bool shouldContinue = false;
+            var shouldContinue = false;
             using (var installerProcess = new Process())
             {
                 // config Process

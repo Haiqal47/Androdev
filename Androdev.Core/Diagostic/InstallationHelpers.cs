@@ -13,18 +13,18 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Microsoft.Win32;
 
 namespace Androdev.Core.Diagostic
 {
     public static class InstallationHelpers
     {
-        private static readonly LogManager _LogManager = LogManager.GetClassLogger();
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
 
-        public const string JdkInstallArguments = "/s ADDLOCAL=\"ToolsFeature,SourceFeature,PublicjreFeature\"";
+        private const string JavaRegistryPath1 = "SOFTWARE\\JavaSoft\\Java Development Kit\\1.8.0_101";
+        private const string JavaRegistryPath2 = "SOFTWARE\\Wow6432Node\\JavaSoft\\Java Development Kit\\1.8.0_101";
+        private const string JdkInstallArguments = "/s ADDLOCAL=\"ToolsFeature,SourceFeature,PublicjreFeature\"";
 
         private static readonly string JdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\jdk-8u101-windows-i586.exe");
         private static readonly string AndroidSdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\android-sdk.zip");
@@ -37,8 +37,8 @@ namespace Androdev.Core.Diagostic
             var sdkExist = File.Exists(AndroidSdkPath);
             var ideExist = File.Exists(EclipseIdePath);
             var adtExist = File.Exists(AdtPath);
-
-            _LogManager.Debug(string.Format("JDK:{0}, SDK:{1}, IDE:{2}, ADT:{3}", jdkExist, sdkExist, ideExist, adtExist));
+            
+            Logger.Debug(string.Format("JDK:{0}, SDK:{1}, IDE:{2}, ADT:{3}", jdkExist, sdkExist, ideExist, adtExist));
 
             return jdkExist && sdkExist && ideExist && adtExist;
         }
@@ -46,44 +46,50 @@ namespace Androdev.Core.Diagostic
         public static bool IsAndrodevDirectoryExist(string root)
         {
             var exist = Directory.Exists(Path.Combine(root, "Androdev"));
-            _LogManager.Debug("Androdev installation on " + root + " is " + exist);
+            Logger.Debug("Androdev installation on " + root + " is " + exist);
 
             return exist;
+        }
+
+        public static bool InstallJavaDevelopmentKit()
+        {
+            var jdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\jdk-8u101-windows-i586.exe");
+            var success = ProcessHelper.RunAndWait(jdkPath, JdkInstallArguments);
+            Logger.Debug("JDK installation success: " + success);
+
+            return success;
         }
 
         public static string GetJavaInstallationPath()
         {
             string javaHome = null;
-
-            // find on first location (on 32-bit)
+            
             try
             {
-                var location1 = Registry.LocalMachine.OpenSubKey("SOFTWARE\\JavaSoft\\Java Development Kit\\1.8.0_101");
-                if (location1 != null)
-                    javaHome = location1.GetValue("JavaHome").ToString();
+                // find on first location (on 32-bit)
+                var location1 = Registry.LocalMachine.OpenSubKey(JavaRegistryPath1);
+                javaHome = location1?.GetValue("JavaHome").ToString();
             }
             catch (Exception ex)
             {
-                _LogManager.Error(ex);
+                Logger.Error(ex);
             }
 
             // found it?
             if (javaHome != null) return javaHome;
-
-            // find on second location (on 64-bit)
+            
             try
             {
-                var location2 =
-                    Registry.LocalMachine.OpenSubKey("SOFTWARE\\Wow6432Node\\JavaSoft\\Java Development Kit\\1.8.0_101");
-                if (location2 != null)
-                    javaHome = location2.GetValue("JavaHome").ToString();
+                // find on second location (on 64-bit)
+                var location2 = Registry.LocalMachine.OpenSubKey(JavaRegistryPath2);
+                javaHome = location2?.GetValue("JavaHome").ToString();
             }
             catch (Exception ex)
             {
-                _LogManager.Error(ex);
+                Logger.Error(ex);
             }
-            
-            _LogManager.Info("Java installation path detected in " + javaHome);
+
+            Logger.Info("Java installation path detected in " + javaHome);
             return javaHome;
         }
     }
