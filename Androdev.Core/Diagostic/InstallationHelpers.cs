@@ -32,6 +32,9 @@ namespace Androdev.Core.Diagostic
         private static readonly string EclipseIdePath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\eclipse-java-mars-2-win32.zip");
         private static readonly string AdtPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\ADT-23.0.7.zip");
 
+        public const double AndroidSdkFileCount = 77508d;
+        public const double EclipseIdeFileCount = 1494d;
+
         public static bool CheckDependecies()
         {
             var jdkExist = File.Exists(JdkPath);
