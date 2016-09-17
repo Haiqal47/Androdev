@@ -13,14 +13,14 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Androdev.Core.Native
 {
-    [Serializable, StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto), BestFitMapping(false)]
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    [BestFitMapping(false)]
     public class WIN32_FIND_DATA
     {
         public FileAttributes dwFileAttributes;
@@ -41,7 +41,7 @@ namespace Androdev.Core.Native
 
         public override string ToString()
         {
-            return "File name=" + cFileName;
+            return cFileName;
         }
     }
 }

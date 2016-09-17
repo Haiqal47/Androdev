@@ -12,10 +12,8 @@
 // 
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
-using System;
-using System.Collections.Generic;
+
 using System.Security.Permissions;
-using System.Text;
 using Microsoft.Win32.SafeHandles;
 
 namespace Androdev.Core.Native
@@ -30,7 +28,7 @@ namespace Androdev.Core.Native
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         protected override bool ReleaseHandle()
         {
-            return NativeMethods.FindClose(base.handle);
+            return NativeMethods.FindClose(handle);
         }
     }
 }

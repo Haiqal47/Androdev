@@ -13,9 +13,7 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Androdev.Core.Native;
 
 namespace Androdev.Core.IO
@@ -26,7 +24,7 @@ namespace Androdev.Core.IO
         #region Properties
         public FileAttributes Attributes { get; }
 
-        public DateTime CreationTime => this.CreationTimeUtc.ToLocalTime();
+        public DateTime CreationTime => CreationTimeUtc.ToLocalTime();
 
         public DateTime CreationTimeUtc { get; }
 
@@ -52,13 +50,13 @@ namespace Androdev.Core.IO
 
         internal FileData(string dir, WIN32_FIND_DATA findData)
         {
-            this.Attributes = findData.dwFileAttributes;
-            this.CreationTimeUtc = ConvertDateTime(findData.ftCreationTime_dwHighDateTime, findData.ftCreationTime_dwLowDateTime);
-            this.LastAccessTimeUtc = ConvertDateTime(findData.ftLastAccessTime_dwHighDateTime, findData.ftLastAccessTime_dwLowDateTime);
-            this.LastWriteTimeUtc = ConvertDateTime(findData.ftLastWriteTime_dwHighDateTime, findData.ftLastWriteTime_dwLowDateTime);
-            this.Size = CombineHighLowInts(findData.nFileSizeHigh, findData.nFileSizeLow);
-            this.Name = findData.cFileName;
-            this.FullPath = Path.Combine(dir, findData.cFileName).TrimEnd(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            Attributes = findData.dwFileAttributes;
+            CreationTimeUtc = ConvertDateTime(findData.ftCreationTime_dwHighDateTime, findData.ftCreationTime_dwLowDateTime);
+            LastAccessTimeUtc = ConvertDateTime(findData.ftLastAccessTime_dwHighDateTime, findData.ftLastAccessTime_dwLowDateTime);
+            LastWriteTimeUtc = ConvertDateTime(findData.ftLastWriteTime_dwHighDateTime, findData.ftLastWriteTime_dwLowDateTime);
+            Size = CombineHighLowInts(findData.nFileSizeHigh, findData.nFileSizeLow);
+            Name = findData.cFileName;
+            FullPath = Path.Combine(dir, findData.cFileName).TrimEnd(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
         }
 
         private static long CombineHighLowInts(uint high, uint low)
