@@ -26,15 +26,15 @@ namespace Androdev.Presenter
 {
     public class UpdatePackagesPresenter : IDisposable
     {
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
+        private readonly BackgroundWorker _bwDownloader;
+
         private readonly UpdatePackagesModel _model;
-        private UpdatePackagesView _view;
-
-        private BackgroundWorker bwDownloader;
-
+        private readonly UpdatePackagesView _view;
+        
         private delegate void UpdateDownloadInfoDelegate(string filename, long downloadSize, string queue);
         private delegate void UpdateProgressDelegate(long downloaded, int progress);
 
-        // Model Properties
         public UpdatePackagesModel Model
         {
             get { return _model; }
@@ -45,9 +45,9 @@ namespace Androdev.Presenter
             _view = view;
             _model = new UpdatePackagesModel();
 
-            bwDownloader = new BackgroundWorker {WorkerSupportsCancellation = true};
-            bwDownloader.DoWork += BwDownloaderOnDoWork;
-            bwDownloader.RunWorkerCompleted += BwDownloaderOnRunWorkerCompleted;
+            _bwDownloader = new BackgroundWorker {WorkerSupportsCancellation = true};
+            _bwDownloader.DoWork += BwDownloaderOnDoWork;
+            _bwDownloader.RunWorkerCompleted += BwDownloaderOnRunWorkerCompleted;
 
             ConfigureCancelButtonDelegate();
         }
@@ -55,6 +55,7 @@ namespace Androdev.Presenter
         #region BackgroundWorker
         private void BwDownloaderOnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
         {
+            // remove old bin folder
             var binDirectory = Path.Combine(Commons.GetBaseDirectoryPath(), "bin");
             try
             {
@@ -63,13 +64,19 @@ namespace Androdev.Presenter
                     Directory.Delete(binDirectory, true);
                 }
             }
-            catch { /* ignored */ }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
 
+            // create new bin folder
             Directory.CreateDirectory(binDirectory);
 
+            // download each files
             for (int i = 0; i < 5; i++)
             {
-                if (bwDownloader.CancellationPending) return;
+                // cancelled
+                if (_bwDownloader.CancellationPending) return;
 
                 // prepare variables
                 HttpWebRequest fileRequest;
@@ -87,6 +94,7 @@ namespace Androdev.Presenter
                     var fileName = Commons.GetFilenameFromUri(downloadUri);
                     var outputFile = (i == 0 ? "android-sdk.zip" : Path.Combine(binDirectory, fileName));
 
+                    Logger.Debug(string.Format("Requesting file: {0} ({1})", fileName, fileSize));
                     UpdateDownloadInfo(fileName, fileSize, string.Format("{0} of 4", i + 1));
 
                     // get response stream and open output stream
@@ -104,7 +112,7 @@ namespace Androdev.Presenter
                         do
                         {
                             // cancelled
-                            if (bwDownloader.CancellationPending) return;
+                            if (_bwDownloader.CancellationPending) return;
 
                             // write buffer
                             nRead += bytesRead;
@@ -118,12 +126,11 @@ namespace Androdev.Presenter
                         } while ((bytesRead = remoteStream.Read(buffer, 0, buffer.Length)) != 0);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // opps, error occured
-                    doWorkEventArgs.Cancel = true;
-                    bwDownloader.CancelAsync();
+                    Logger.Error(ex);
                     UpdateDownloadInfo("An error occured. Download cancelled.", 0, "0 of 0");
+                    _bwDownloader.CancelAsync();
                 }
                 finally
                 {
@@ -166,17 +173,9 @@ namespace Androdev.Presenter
 
         public void StartUpdate()
         {
-            if (!bwDownloader.IsBusy)
+            if (!_bwDownloader.IsBusy)
             {
-                bwDownloader.RunWorkerAsync();
-            }
-        }
-
-        public void StopUpdate()
-        {
-            if (bwDownloader.IsBusy)
-            {
-                bwDownloader.CancelAsync();
+                _bwDownloader.RunWorkerAsync();
             }
         }
         #endregion
@@ -187,42 +186,30 @@ namespace Androdev.Presenter
         private void ConfigureCancelButtonDelegate()
         {
             if (MessageBox.Show(TextResource.CancelPackageDownloadText, TextResource.CancelPackageDownloadTitle,
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+            if (_bwDownloader.IsBusy)
             {
-                bwDownloader.CancelAsync();
+                _bwDownloader.CancelAsync();
             }
         }
         #endregion
-
         
-
         #region IDisposable Support
-        private bool _disposedValue = false; // To detect redundant calls
+        private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
             if (_disposedValue) return;
             if (disposing)
             {
-                bwDownloader?.Dispose();
+                _bwDownloader?.Dispose();
             }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-            // TODO: set large fields to null.
 
             _disposedValue = true;
         }
 
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~UpdatePackagesPresenter() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
             GC.SuppressFinalize(this);
         }
