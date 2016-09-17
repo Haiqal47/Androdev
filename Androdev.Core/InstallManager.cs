@@ -221,6 +221,10 @@ namespace Androdev.Core
             Logger.Info("==========Install Shortcuts on Desktop [Started]===========");
             InstallShortcuts();
             Logger.Info("==========Install Shortcuts on Desktop [Finished]===========");
+
+            // all finish
+            WorkerReportProgress(0, 0, "Androdev has been installed successfully.");
+            Logger.Info("Androdev has been installed successfully.");
         }
         #endregion
 
@@ -246,16 +250,16 @@ namespace Androdev.Core
 
             // configure workspace path
             Directory.CreateDirectory(workspaceDirectory);
-            if (eclipseConfigService.ConfigureWorkspaceDirectory())
+            if (!eclipseConfigService.ConfigureWorkspaceDirectory())
             {
-                Logger.Error("Cannto change Eclipse Workspace directory.");
+                Logger.Error("Cannot change Eclipse Workspace directory.");
                 WorkerReportProgress(0, 0, "Cannot change Eclipse Workspace directory.");
                 _bwWorker.CancelAsync();
                 return;
             }
 
             Logger.Debug("Workspace directory created and has been set to Eclipse configuration.");
-            WorkerReportProgress(54, 99, "Eclipse IDE Post-Action completed.");
+            WorkerReportProgress(56, 100, "Eclipse IDE Post-Action completed.");
         }
         #endregion
 
@@ -413,8 +417,7 @@ namespace Androdev.Core
                 Logger.Debug("Extracting Eclipse IDE...");
 
                 FastZip eclipseZip = new FastZip(zipEvents);
-                eclipseZip.ExtractZip(zipSource, _installDirectory, FastZip.Overwrite.Always, name => true, null, null,
-                    true);
+                eclipseZip.ExtractZip(zipSource, _installDirectory, FastZip.Overwrite.Always, name => true, null, null, true);
 
                 Logger.Debug("Eclipse IDE installed.");
             }
@@ -429,7 +432,6 @@ namespace Androdev.Core
             EclipseIdePostInstallation();
 
             Logger.Debug("Eclipse configuration initialized successfully.");
-            WorkerReportProgress(56, 100, "Eclipse Mars 2 installed.");
         }
 
         private void InstallManifests()
@@ -494,11 +496,23 @@ namespace Androdev.Core
 
             // configure SDK path
             var androidSdkPath = Path.Combine(_installDirectory, "android-sdk");
-            eclipseConfigService.ConfigureSdkPath(androidSdkPath);
+            if (!eclipseConfigService.ConfigureSdkPath(androidSdkPath))
+            {
+                Logger.Error("Cannot change Android SDK path in ADT.");
+                WorkerReportProgress(0, 0, "Cannot configure Android SDK path.");
+                _bwWorker.CancelAsync();
+                return;
+            }
             Logger.Debug("Android SDK path has configured in Eclipse configuration.");
 
             // configure code assist
-            eclipseConfigService.ConfigureCodeAssist();
+            if (!eclipseConfigService.ConfigureCodeAssist())
+            {
+                Logger.Error("Cannot configure Code Assist in Eclipse.");
+                WorkerReportProgress(0, 0, "Cannot configure Code Assist in Eclipse.");
+                _bwWorker.CancelAsync();
+                return;
+            }
             Logger.Debug("Code assist auto-activation has been changed.");
 
             WorkerReportProgress(86, 63, "Configuration completed.");
@@ -514,6 +528,7 @@ namespace Androdev.Core
                 Target = Path.Combine(_installDirectory, "android-sdk\\SDK Manager.exe"),
                 Name = "Android SDK Tools",
                 Comment = "Launch Android SDK Tools.",
+                IconFile = Path.Combine(_installDirectory, "android-sdk\\tools\\emulator.exe"),
             });
 
             FastIo.CreateShortcut(new ShortcutProperties()
