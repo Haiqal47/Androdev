@@ -21,7 +21,7 @@ namespace Androdev.Core
 {
     public class LogManager
     {
-        private const string LogFormatString = "{0}  {1} [{2}][{3}] {4}";
+        private const string LogFormatString = "{0}\t{1}\t[{2}][{3}] {4}";
         private const string ShortDateFormat = "yyyy-MM-dd";        // ISO8601
         private const string LongDateFormat = "yyyyMMdd'T'HHmmss";  // ISO8601
 

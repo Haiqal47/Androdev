@@ -78,8 +78,6 @@ namespace Androdev.Core
             var drives = FastIo.GetAvailiableDrives();
             for (var i = 0; i < drives.Length; i++)
             {
-                Logger.Debug("Found drive: " + drives[i].Name);
-
                 // is system disk?
                 if (systemDisk.StartsWith(drives[i].Name)) continue;
 
