@@ -13,7 +13,6 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -79,6 +78,17 @@ namespace Androdev.Core
             return newpath;
         }
 
+        public static string ToEclipseCompliantPath(string origPath)
+        {
+            var driveRootChar = origPath.Substring(0, 1);
+            var relativePath = origPath.Substring(3);
+            var sb = new StringBuilder();
+            sb.Append(driveRootChar);
+            sb.Append("\\:\\\\");
+            sb.Append(relativePath.Replace("\\", "\\\\"));
+            return sb.ToString();
+        }
+
         [Obsolete]
         public static bool CompareSha1Hash(string filePath, string hash)
         {
@@ -96,17 +106,6 @@ namespace Androdev.Core
             sha1.Clear();
 
             return hash == formatted.ToString();
-        }
-
-        public static string ToEclipseCompliantPath(string origPath)
-        {
-            var driveRootChar = origPath.Substring(0, 1);
-            var relativePath = origPath.Substring(3);
-            var sb = new StringBuilder();
-            sb.Append(driveRootChar);
-            sb.Append("\\:\\\\");
-            sb.Append(relativePath.Replace("\\", "\\\\"));
-            return sb.ToString();
         }
     }
 }

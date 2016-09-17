@@ -13,18 +13,16 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Permissions;
 using System.Text;
 using Androdev.Core.Diagostic;
-using Androdev.Core.IO;
 
 namespace Androdev.Core
 {
     public class EclipseConfigurator
     {
-        private static LogManager _logManager = LogManager.GetClassLogger();
+        private static readonly LogManager _logManager = LogManager.GetClassLogger();
         private const string EclipsecSuccess = "Operation completed";
 
         private readonly string _eclipseCommandLinePath;
