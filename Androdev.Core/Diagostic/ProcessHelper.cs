@@ -13,6 +13,7 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Diagnostics;
 using System.Security.Permissions;
 using System.Text;
@@ -20,14 +21,21 @@ using System.Threading;
 
 namespace Androdev.Core.Diagostic
 {
-    public class ProcessHelper
+    public static class ProcessHelper
     {
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
+
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool RunAndWait(string filePath, string cmdLine, string ouputTextShouldTrue)
         {
             var shouldContinue = false;
-            using (var installerProcess = new Process())
+            Process installerProcess = null;
+            AutoResetEvent outputWaitHandle = null;
+            try
             {
+                installerProcess = new Process();
+                outputWaitHandle = new AutoResetEvent(false);
+
                 // config Process
                 installerProcess.StartInfo = new ProcessStartInfo()
                 {
@@ -42,43 +50,52 @@ namespace Androdev.Core.Diagostic
                 StringBuilder outputBuffer = new StringBuilder();
 
                 // reset event to manage async
-                using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                installerProcess.OutputDataReceived += (sender, e) =>
                 {
-                    installerProcess.OutputDataReceived += (sender, e) =>
-                    {
-                        if (e.Data == null)
-                            outputWaitHandle?.Set();
-                        else
-                            outputBuffer.AppendLine(e.Data);
-                    };
+                    if (e.Data == null)
+                        outputWaitHandle?.Set();
+                    else
+                        outputBuffer.AppendLine(e.Data);
+                };
 
-                    // start installer
-                    if (installerProcess.Start())
-                    {
-                        // redirect
-                        installerProcess.BeginOutputReadLine();
+                // start installer
+                if (!installerProcess.Start()) return false;
 
-                        // wait for executable
-                        shouldContinue = installerProcess.WaitForExit(Commons.Wait15MinMilis) && outputWaitHandle.WaitOne(Commons.Wait15MinMilis);
+                // redirect
+                installerProcess.BeginOutputReadLine();
 
-                        // check if process is still running
-                        if (!installerProcess.HasExited)
-                        {
-                            installerProcess.Kill();
-                        }
-                    }
+                // wait for executable
+                shouldContinue = installerProcess.WaitForExit(Commons.Wait15MinMilis) &&
+                                 outputWaitHandle.WaitOne(Commons.Wait15MinMilis);
+                // check if process is still running
+                if (!installerProcess.HasExited)
+                {
+                    installerProcess.Kill();
                 }
 
                 // check output lines
                 return shouldContinue && outputBuffer.ToString().Contains(ouputTextShouldTrue);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return false;
+            }
+            finally
+            {
+                installerProcess?.Close();
+                outputWaitHandle?.Close();
             }
         }
 
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool RunAndWait(string filePath, string cmdLine)
         {
-            using (var installerProcess = new Process())
+            Process installerProcess = null;
+            try
             {
+                installerProcess = new Process();
+
                 // config Process
                 installerProcess.StartInfo = new ProcessStartInfo()
                 {
@@ -88,19 +105,25 @@ namespace Androdev.Core.Diagostic
                 };
 
                 // start installer
-                if (installerProcess.Start())
-                {
-                    // wait for installer
-                    if (installerProcess.WaitForExit(Commons.Wait15MinMilis)) return true;
+                if (!installerProcess.Start()) return false;
 
-                    // kill if installer running too long
-                    installerProcess.Kill();
-                    return false;
-                }
+                // wait for installer
+                if (installerProcess.WaitForExit(Commons.Wait15MinMilis)) return true;
+
+                // kill if installer running too long
+                installerProcess.Kill();
                 return false;
             }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return false;
+            }
+            finally
+            {
+                installerProcess?.Close();
+            }
         }
-
     }
 }
 
