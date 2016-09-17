@@ -65,8 +65,8 @@ namespace Androdev.View
         {
             if (disposing)
             {
-                components?.Dispose();
-                _presenter.Dispose();
+                if (components != null) components.Dispose();
+                if (_presenter != null) _presenter.Dispose();
             }
             base.Dispose(disposing);
         }

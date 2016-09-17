@@ -50,6 +50,15 @@ namespace Androdev.View
 
             picStatus.DataBindings.Add("Visible", _presenter.Model, "LoadingAnimationVisible");
         }
-   
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null) components.Dispose();
+                if (_presenter != null) _presenter.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }
