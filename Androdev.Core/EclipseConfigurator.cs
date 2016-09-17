@@ -113,12 +113,12 @@ namespace Androdev.Core
 
         public bool InitializeEclipseConfiguration()
         {
-            return ProcessHelper.ExecuteProcessAndWait(_eclipseCommandLinePath, EclipsePrepareConfigArguments);
+            return ProcessHelper.RunAndWait(_eclipseCommandLinePath, EclipsePrepareConfigArguments);
         }
 
         public bool InstallAdt(string adtPackagePath)
         {
-            return ProcessHelper.ExecuteProcessWaitAndCheckForOutput(_eclipseCommandLinePath, BuildAdtInstallArgument(adtPackagePath), EclipsecSuccess);
+            return ProcessHelper.RunAndWait(_eclipseCommandLinePath, BuildAdtInstallArgument(adtPackagePath), EclipsecSuccess);
         }
         
         public bool ConfigureWorkspaceDirectory()

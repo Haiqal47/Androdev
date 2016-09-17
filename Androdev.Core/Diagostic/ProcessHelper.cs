@@ -12,8 +12,7 @@
 // 
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
-using System;
-using System.Collections.Generic;
+
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -22,7 +21,7 @@ namespace Androdev.Core.Diagostic
 {
     public class ProcessHelper
     {
-        public static bool ExecuteProcessWaitAndCheckForOutput(string filePath, string cmdLine, string ouputTextShouldTrue)
+        public static bool RunAndWait(string filePath, string cmdLine, string ouputTextShouldTrue)
         {
             bool shouldContinue = false;
             using (var installerProcess = new Process())
@@ -73,7 +72,7 @@ namespace Androdev.Core.Diagostic
             }
         }
 
-        public static bool ExecuteProcessAndWait(string filePath, string cmdLine)
+        public static bool RunAndWait(string filePath, string cmdLine)
         {
             using (var installerProcess = new Process())
             {
