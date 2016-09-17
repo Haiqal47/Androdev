@@ -53,6 +53,7 @@ namespace Androdev.Presenter
         {
             UpdateSetupButton(1, true);
             _model.LoadingAnimationVisible = true;
+            ResetUi();
         }
 
         private void InstallManager_InstallProgressChanged(object sender, InstallProgressChangedEventArgs e)
@@ -72,22 +73,35 @@ namespace Androdev.Presenter
         {
             UpdateSetupButton(0, true);
             _model.LoadingAnimationVisible = false;
+            ResetUi();
         }
         #endregion
+
+        #region Methods
+        private void ResetUi()
+        {
+            _model.CurrentProgressPercentage = 0;
+            _model.DescriptionText = "";
+            _model.OverallProgressPercentage = 0;
+            _model.ProgressStyle = ProgressBarStyle.Blocks;
+        }
 
         private void UpdateSetupButton(int imgIndex, bool enabled)
         {
             _model.SetupButtonImageIndex = imgIndex;
             _model.SetupButtonEnabled = enabled;
-            if (imgIndex == 0)
+
+            switch (imgIndex)
             {
-                _model.SetupButtonText = "Start installation";
-            }
-            else if (imgIndex == 1)
-            {
-                _model.SetupButtonText = "Stop installation";
+                case 0:
+                    _model.SetupButtonText = "Start installation";
+                    break;
+                case 1:
+                    _model.SetupButtonText = "Stop installation";
+                    break;
             }
         }
+        #endregion
 
         #region Delegates
         public EventHandler SetupClickEventHandler;
@@ -107,26 +121,30 @@ namespace Androdev.Presenter
 
         private void InstallHandler(object sender, EventArgs e)
         {
-            if (_model.SetupButtonImageIndex == 0)
+            switch (_model.SetupButtonImageIndex)
             {
-                UpdateSetupButton(0, false);
-                _installManager.BeginInstall();
-            }
-            else if (_model.SetupButtonImageIndex == 1)
-            {
-                UpdateSetupButton(1, false);
-                _installManager.EndInstall();
+                case 0:
+                    Logger.Debug("User starts installation process.");
+                    UpdateSetupButton(0, false);
+                    _installManager.BeginInstall();
+                    break;
+
+                case 1:
+                    Logger.Debug("User stops installation process.");
+                    UpdateSetupButton(1, false);
+                    _installManager.EndInstall();
+                    break;
             }
         }
 
         private void UpdatePackagesHandler(object sender, EventArgs e)
         {
-            if (MessageBox.Show(TextResource.UpdateConfirmationText, TextResource.UpdateConfirmationTitle,
-                                MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+            if (MessageBox.Show(TextResource.UpdateConfirmationText, TextResource.UpdateConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
                 return;
 
             using (var frm = new UpdatePackagesView())
             {
+                Logger.Debug("User confirmed to update packages.");
                 frm.ShowDialog();
             }
         }
@@ -144,11 +162,12 @@ namespace Androdev.Presenter
                     _installManager.SetInstallRoot(frm.InstallRoot);
                     _installManager.SetUacCompatibility(frm.UacCompatibility);
                     UpdateSetupButton(0, true);
+                    Logger.Debug(string.Format("Install parameter changed. Root:{0}, UAC:{1}", frm.InstallRoot, frm.UacCompatibility));
                 }
                 catch (Exception ex)
                 {
+                    Logger.Error(ex);
                     MessageBox.Show(TextResource.CantChangeConfigText, TextResource.CantChangeConfigTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    Logger.Error("Unable to change install config.", ex);
                 }
             }
         }
@@ -172,9 +191,9 @@ namespace Androdev.Presenter
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposedValue || !disposing) return;
+            if (!_disposedValue && disposing) return;
             
-            _installManager.Dispose();
+            _installManager?.Dispose();
 
             _disposedValue = true;
         }
