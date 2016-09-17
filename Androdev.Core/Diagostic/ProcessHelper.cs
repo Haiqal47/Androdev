@@ -28,7 +28,6 @@ namespace Androdev.Core.Diagostic
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool RunAndWait(string filePath, string cmdLine, string ouputTextShouldTrue)
         {
-            var shouldContinue = false;
             Process installerProcess = null;
             AutoResetEvent outputWaitHandle = null;
             try
@@ -47,7 +46,7 @@ namespace Androdev.Core.Diagostic
                 };
 
                 // output buffer
-                StringBuilder outputBuffer = new StringBuilder();
+                var outputBuffer = new StringBuilder();
 
                 // reset event to manage async
                 installerProcess.OutputDataReceived += (sender, e) =>
@@ -65,8 +64,8 @@ namespace Androdev.Core.Diagostic
                 installerProcess.BeginOutputReadLine();
 
                 // wait for executable
-                shouldContinue = installerProcess.WaitForExit(Commons.Wait15MinMilis) &&
-                                 outputWaitHandle.WaitOne(Commons.Wait15MinMilis);
+                var success = installerProcess.WaitForExit(Commons.Wait15MinMilis) &&
+                              outputWaitHandle.WaitOne(Commons.Wait15MinMilis);
                 // check if process is still running
                 if (!installerProcess.HasExited)
                 {
@@ -74,7 +73,7 @@ namespace Androdev.Core.Diagostic
                 }
 
                 // check output lines
-                return shouldContinue && outputBuffer.ToString().Contains(ouputTextShouldTrue);
+                return success && outputBuffer.ToString().Contains(ouputTextShouldTrue);
             }
             catch (Exception ex)
             {
