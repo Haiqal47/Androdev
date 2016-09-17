@@ -132,7 +132,7 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-               
+               _logManager.Error(ex);
                 return false;
             }
         }
@@ -148,7 +148,7 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-            
+                _logManager.Error(ex);
                 return false;
             }
         }
@@ -164,7 +164,7 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-          
+                _logManager.Error(ex);
                 return false;
             }
         }

@@ -20,7 +20,7 @@ namespace Androdev.Core
 {
     public class LogManager
     {
-        private const string LogFormatString = "{0}  {1} {2}: {3}";
+        private const string LogFormatString = "{0}  {1} {2}{3}: {4}";
         private const string ShortDateFormat = "yyyy-MM-dd";        // ISO8601
         private const string LongDateFormat = "yyyyMMdd'T'HHmmss";  // ISO8601
 
@@ -28,17 +28,14 @@ namespace Androdev.Core
 
         public static LogManager GetClassLogger()
         {
-            var tempTrace = new StackTrace();
-            var tempMethod = tempTrace.GetFrame(1).GetMethod();
+            var tempTrace = new StackFrame(1);
+            var tempMethod = tempTrace.GetMethod();
 
-            if (tempMethod.ReflectedType == null)
+            if (tempMethod.DeclaringType != null)
             {
-                return new LogManager("UNTRACEABLE");
+                return new LogManager(tempMethod.DeclaringType.Name);
             }
-            else
-            {
-                return new LogManager(tempMethod.ReflectedType.Name);
-            }
+            return new LogManager("UNTRACEABLE");
         }
 
         public static void ConfigureLogger()
@@ -92,7 +89,11 @@ namespace Androdev.Core
 
         private void WriteEntry(string message, string level)
         {
-            Trace.WriteLine(string.Format(LogFormatString, DateTime.Now.ToString(LongDateFormat), level, _logClass, message));
+            var frame = new StackFrame(2);
+            var caller = frame.GetMethod().Name;
+            var currentDate = DateTime.Now.ToString(LongDateFormat);
+
+            Trace.WriteLine(string.Format(LogFormatString, currentDate, level, _logClass, caller, message));
         }
     }
 }

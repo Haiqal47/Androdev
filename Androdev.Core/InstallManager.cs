@@ -483,8 +483,7 @@ namespace Androdev.Core
                 Name = "Eclipse Mars for Android",
                 Comment = "Launch Eclipse Mars IDE for Android.",
             });
-
-
+            
             FastIO.CreateShortcut(new ShortcutProperties()
             {
                 Target = Path.Combine(_installDirectory, "workspace"),
