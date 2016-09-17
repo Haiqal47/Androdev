@@ -22,7 +22,7 @@ namespace Androdev.Core
 {
     public class EclipseConfigurator
     {
-        private static readonly LogManager _logManager = LogManager.GetClassLogger();
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
         private const string EclipsecSuccess = "Operation completed";
 
         private readonly string _eclipseCommandLinePath;
@@ -133,7 +133,7 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-               _logManager.Error(ex);
+               Logger.Error(ex);
                 return false;
             }
         }
@@ -149,7 +149,7 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-                _logManager.Error(ex);
+                Logger.Error(ex);
                 return false;
             }
         }
@@ -165,7 +165,7 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-                _logManager.Error(ex);
+                Logger.Error(ex);
                 return false;
             }
         }
