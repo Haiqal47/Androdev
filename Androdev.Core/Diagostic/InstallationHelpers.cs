@@ -22,6 +22,8 @@ namespace Androdev.Core.Diagostic
 {
     public static class InstallationHelpers
     {
+        private static readonly LogManager _LogManager = LogManager.GetClassLogger();
+
         public const string JdkInstallArguments = "/s ADDLOCAL=\"ToolsFeature,SourceFeature,PublicjreFeature\"";
 
         private static readonly string JdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\jdk-8u101-windows-i586.exe");
@@ -36,12 +38,17 @@ namespace Androdev.Core.Diagostic
             var ideExist = File.Exists(EclipseIdePath);
             var adtExist = File.Exists(AdtPath);
 
+            _LogManager.Debug(string.Format("JDK:{0}, SDK:{1}, IDE:{2}, ADT:{3}", jdkExist, sdkExist, ideExist, adtExist));
+
             return jdkExist && sdkExist && ideExist && adtExist;
         }
 
         public static bool IsAndrodevDirectoryExist(string root)
         {
-            return Directory.Exists(Path.Combine(root, "Androdev"));
+            var exist = Directory.Exists(Path.Combine(root, "Androdev"));
+            _LogManager.Debug("Androdev installation on " + root + " is " + exist);
+
+            return exist;
         }
 
         public static string GetJavaInstallationPath()
@@ -55,9 +62,9 @@ namespace Androdev.Core.Diagostic
                 if (location1 != null)
                     javaHome = location1.GetValue("JavaHome").ToString();
             }
-            catch
+            catch (Exception ex)
             {
-                /* ignored */
+                _LogManager.Error(ex);
             }
 
             // found it?
@@ -71,11 +78,12 @@ namespace Androdev.Core.Diagostic
                 if (location2 != null)
                     javaHome = location2.GetValue("JavaHome").ToString();
             }
-            catch
+            catch (Exception ex)
             {
-                /* ignored */
+                _LogManager.Error(ex);
             }
-
+            
+            _LogManager.Info("Java installation path detected in " + javaHome);
             return javaHome;
         }
     }
