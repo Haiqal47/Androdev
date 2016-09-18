@@ -14,11 +14,13 @@
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
+using System.Security;
 using System.Security.Permissions;
 using System.Windows.Forms;
 
 namespace AndroUtility
 {
+    [SecurityCritical]
     public class ListViewEx : ListView
     {
         private const uint WmErasebkgnd = 0x14;
@@ -32,7 +34,7 @@ namespace AndroUtility
             SetStyle(ControlStyles.EnableNotifyMessage, true);
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override void OnNotifyMessage(Message m)
         {
             if (m.Msg != WmErasebkgnd)
