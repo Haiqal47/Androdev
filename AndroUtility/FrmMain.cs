@@ -143,6 +143,7 @@ namespace AndroUtility
                 openDlg.Filter = "Log file|*.txt";
                 if (openDlg.ShowDialog() == DialogResult.OK)
                 {
+                    listViewEx1.Items.Clear();
                     bwReader.RunWorkerAsync(openDlg.FileName);
 
                     lblStatus.Text = "Reading log...";
