@@ -74,7 +74,10 @@
     <PostBuildEvent>echo vshost.exe &gt; exc.txt
 echo pdb &gt;&gt; exc.txt
 echo txt &gt;&gt; exc.txt
+echo codeanalysis &gt;&gt; exc.txt
+
 xcopy "$(TargetDir)*" "$(SolutionDir)ReleaseBuild" /s /i /Y /exclude:exc.txt
+
 del exc.txt /f</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
