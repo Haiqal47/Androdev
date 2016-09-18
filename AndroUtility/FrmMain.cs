@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -15,26 +14,15 @@ namespace AndroUtility
 {
     public partial class FrmMain : Form
     {
-        private readonly string _androidSdkPath = "";
+        private string _androidSdkPath;
 
         public FrmMain()
         {
             InitializeComponent();
 
-            // find Androdev installation
-            var drives = FastIo.GetAvailiableDrives();
-            for (int i = 0; i < drives.Length; i++)
-            {
-                var currentDrive = drives[i].Name;
-                if (!InstallationHelpers.IsAndrodevDirectoryExist(currentDrive)) continue;
-
-                _androidSdkPath = Path.Combine(currentDrive, "Androdev\\android-sdk");
-                if (Directory.Exists(_androidSdkPath))
-                {
-                    break;
-                }
-            }
+            FindAndroidSdk();
         }
+        
 
         #region BackgroundWorker
         private void bwReader_DoWork(object sender, DoWorkEventArgs e)
@@ -102,6 +90,22 @@ namespace AndroUtility
             return sb.ToString();
         }
 
+        private void FindAndroidSdk()
+        {
+            var drives = FastIo.GetAvailiableDrives();
+            for (int i = 0; i < drives.Length; i++)
+            {
+                var currentDrive = drives[i].Name;
+                if (!InstallationHelpers.IsAndrodevDirectoryExist(currentDrive)) continue;
+
+                _androidSdkPath = Path.Combine(currentDrive, "Androdev\\android-sdk");
+                if (Directory.Exists(_androidSdkPath))
+                {
+                    break;
+                }
+            }
+        }
+
         private Color LogLevelToColor(string level)
         {
             switch (level)
@@ -139,7 +143,7 @@ namespace AndroUtility
 
         private void cmdSend_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Currently automated log send if not availiable.\n" +
+            MessageBox.Show("Currently automated log sending is not availiable.\n" +
                 "You can send this log file to developer's email address at (fahminlb33@gmail.com). " +
                 "Glad if you want to tell us about our application!",
                 "Send log file.", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -147,26 +151,38 @@ namespace AndroUtility
         
         private void cmdSdkManager_Click(object sender, EventArgs e)
         {
-            var sdkPath = Path.Combine(_androidSdkPath, "SDK Manager.exe");
-            if (File.Exists(sdkPath))
+            if (_androidSdkPath == null)
             {
-                Process.Start(sdkPath);
-                MessageBox.Show("Launching Android SDK Manager might take a while. Please be patient.",
-                    "Launching SDK Manager", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(
+                    "Existing Androdev installation cannot be found. " +
+                    "Ensure you have installed Androdev on your system.",
+                    "Androdev not found.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
             }
+
+            var sdkPath = Path.Combine(_androidSdkPath, "SDK Manager.exe");
+            if (!File.Exists(sdkPath)) return;
+            Process.Start(sdkPath);
         }
 
         private void cmdAdbTerminal_Click(object sender, EventArgs e)
         {
-            var adbPath = Path.Combine(_androidSdkPath, "platform-tools");
-            if (Directory.Exists(adbPath))
+            if (_androidSdkPath == null)
             {
-                Process.Start(new ProcessStartInfo()
-                {
-                    FileName = "cmd.exe",
-                    WorkingDirectory = adbPath,
-                });
+                MessageBox.Show(
+                    "Existing Androdev installation cannot be found. " +
+                    "Ensure you have installed Androdev on your system.",
+                    "Androdev not found.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
             }
+
+            var adbPath = Path.Combine(_androidSdkPath, "platform-tools");
+            if (!Directory.Exists(adbPath)) return;
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = "cmd.exe",
+                WorkingDirectory = adbPath,
+            });
         }
 
         private void cmdAbout_Click(object sender, EventArgs e)
