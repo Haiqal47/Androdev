@@ -142,7 +142,7 @@
     <value>Androdev not installed.</value>
   </data>
   <data name="UacHelpText" xml:space="preserve">
-    <value>This will add UAC prompt to Eclipse IDE and Android SDK. This was meant only to prevent "access denied" by Windows UAC.
+    <value>This will add UAC elevation to Eclipse IDE and Android SDK.
 This should not be checked when Androdev is installed outside system disk (commonly C:\ drive).</value>
   </data>
   <data name="UacHelpTitle" xml:space="preserve">
@@ -163,7 +163,6 @@ This action cannot be undone.</value>
     <value>Update packages?</value>
   </data>
   <data name="UninstallerWarningText" xml:space="preserve">
-    <value>You are running uninstaller for Androdev. This installer is still in BETA.
-Manual uninstallation is preffered.</value>
+    <value>You are running uninstaller for Androdev. This uninstaller is still in BETA. Manual uninstallation is preffered.</value>
   </data>
 </root>

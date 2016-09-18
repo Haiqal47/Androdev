@@ -25,6 +25,13 @@ namespace Androdev.Model
         private bool _cboDrivesEnabled;
         private string _filename;
 
+        public UninstallerModel()
+        {
+            _uninstallButtonEnabled = true;
+            _cboDrivesEnabled = true;
+            _filename = "...";
+        }
+
         public bool UninstallButtonEnabled
         {
             get { return _uninstallButtonEnabled; }

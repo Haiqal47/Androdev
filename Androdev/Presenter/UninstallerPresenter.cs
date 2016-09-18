@@ -101,22 +101,25 @@ namespace Androdev.Presenter
 
         private void ConfigureUninstallButtonEventHandler()
         {
-            if (InstallationHelpers.IsAndrodevDirectoryExist(_view.SelectedDriveName))
+            StartUninstallationEventHandler = delegate(object sender, EventArgs args)
             {
-                Logger.Debug("Existing Androdev installation not found.");
-                MessageBox.Show(TextResource.NoExistingInstallationText, TextResource.NoExistingInstallationTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
-            if (MessageBox.Show(TextResource.UninstallConfirmationText, TextResource.UninstallConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
-            {
-                Logger.Debug("User cancelled uninstallation.");
-                return;
-            }
+                if (!InstallationHelpers.IsAndrodevDirectoryExist(_view.SelectedDriveName))
+                {
+                    Logger.Debug("Existing Androdev installation not found.");
+                    MessageBox.Show(TextResource.NoExistingInstallationText, TextResource.NoExistingInstallationTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    return;
+                }
+                if (MessageBox.Show(TextResource.UninstallConfirmationText, TextResource.UninstallConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+                {
+                    Logger.Debug("User cancelled uninstallation.");
+                    return;
+                }
 
-            if (_bwWorker.IsBusy) return;
-            Logger.Debug("User started Androdev uninstallation.");
-            _bwWorker.RunWorkerAsync(_view.SelectedDriveName);
-            _model.UninstallButtonEnabled = false;
+                if (_bwWorker.IsBusy) return;
+                Logger.Debug("User started Androdev uninstallation.");
+                _bwWorker.RunWorkerAsync(_view.SelectedDriveName);
+                _model.UninstallButtonEnabled = false;
+            };
         }
         #endregion
 

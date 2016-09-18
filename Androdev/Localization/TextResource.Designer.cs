@@ -133,7 +133,7 @@ namespace Androdev.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This will add UAC prompt to Eclipse IDE and Android SDK. This was meant only to prevent &quot;access denied&quot; by Windows UAC.
+        ///   Looks up a localized string similar to This will add UAC elevation to Eclipse IDE and Android SDK.
         ///This should not be checked when Androdev is installed outside system disk (commonly C:\ drive)..
         /// </summary>
         internal static string UacHelpText {
@@ -171,8 +171,7 @@ namespace Androdev.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are running uninstaller for Androdev. This installer is still in BETA.
-        ///Manual uninstallation is preffered..
+        ///   Looks up a localized string similar to You are running uninstaller for Androdev. This uninstaller is still in BETA. Manual uninstallation is preffered..
         /// </summary>
         internal static string UninstallerWarningText {
             get {
