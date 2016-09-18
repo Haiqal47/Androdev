@@ -193,7 +193,7 @@ namespace Androdev.Presenter
             if (!_disposedValue) return;
             if (disposing)
             {
-                _installManager?.Dispose();
+                if (_installManager != null) _installManager.Dispose();
             }
             
             _disposedValue = true;
