@@ -66,12 +66,12 @@ namespace Androdev.Core
 
         public void Error(Exception ex)
         {
-            WriteEntry("Exception occured.\r\n" + ex, "[ERROR] ");
+            WriteEntry(string.Format("Exception occured.\n{0}", ex.ToString()), "[ERROR] ");
         }
 
         public void Error(string message, Exception ex)
         {
-            WriteEntry(message + "\r\n" + ex.ToString(), "[ERROR] ");
+            WriteEntry(string.Format("{0}\n{1}", message, ex.ToString()), "[ERROR] ");
         }
 
         public void Warning(string message)

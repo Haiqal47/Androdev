@@ -88,12 +88,14 @@ namespace Androdev.Presenter
                     }
                 }
                 Directory.Delete(deletePath, true);
+                _bwWorker.ReportProgress(100, "Androdev successfully uninstalled.");
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+                _bwWorker.ReportProgress(100, "Could not delete Androdev.");
             }
-        }
+}
         #endregion
 
         #region Delegates
