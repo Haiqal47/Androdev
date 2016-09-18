@@ -30,10 +30,21 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmMain));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.cmdOpenLog = new System.Windows.Forms.ToolStripButton();
+            this.cmdSend = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.cmdAbout = new System.Windows.Forms.ToolStripButton();
+            this.cmdSdkManager = new System.Windows.Forms.ToolStripButton();
+            this.cmdAdbTerminal = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.listViewEx1 = new AndroUtility.ListViewEx();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
@@ -47,17 +58,6 @@
             this.lblDeclaringType = new System.Windows.Forms.Label();
             this.lblCallingMethod = new System.Windows.Forms.Label();
             this.bwReader = new System.ComponentModel.BackgroundWorker();
-            this.listViewEx1 = new AndroUtility.ListViewEx();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cmdOpenLog = new System.Windows.Forms.ToolStripButton();
-            this.cmdSend = new System.Windows.Forms.ToolStripButton();
-            this.cmdAbout = new System.Windows.Forms.ToolStripButton();
-            this.cmdSdkManager = new System.Windows.Forms.ToolStripButton();
-            this.cmdAdbTerminal = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -82,10 +82,56 @@
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
+            // cmdOpenLog
+            // 
+            this.cmdOpenLog.Image = global::AndroUtility.Properties.Resources.folder_open;
+            this.cmdOpenLog.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cmdOpenLog.Name = "cmdOpenLog";
+            this.cmdOpenLog.Size = new System.Drawing.Size(76, 22);
+            this.cmdOpenLog.Text = "Open log";
+            this.cmdOpenLog.Click += new System.EventHandler(this.cmdOpenLog_Click);
+            // 
+            // cmdSend
+            // 
+            this.cmdSend.Image = global::AndroUtility.Properties.Resources.mail_send;
+            this.cmdSend.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cmdSend.Name = "cmdSend";
+            this.cmdSend.Size = new System.Drawing.Size(73, 22);
+            this.cmdSend.Text = "Send log";
+            this.cmdSend.Click += new System.EventHandler(this.cmdSend_Click);
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // cmdAbout
+            // 
+            this.cmdAbout.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.cmdAbout.Image = global::AndroUtility.Properties.Resources.info;
+            this.cmdAbout.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cmdAbout.Name = "cmdAbout";
+            this.cmdAbout.Size = new System.Drawing.Size(60, 22);
+            this.cmdAbout.Text = "About";
+            this.cmdAbout.Click += new System.EventHandler(this.cmdAbout_Click);
+            // 
+            // cmdSdkManager
+            // 
+            this.cmdSdkManager.Image = global::AndroUtility.Properties.Resources.android;
+            this.cmdSdkManager.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cmdSdkManager.Name = "cmdSdkManager";
+            this.cmdSdkManager.Size = new System.Drawing.Size(98, 22);
+            this.cmdSdkManager.Text = "SDK Manager";
+            this.cmdSdkManager.Click += new System.EventHandler(this.cmdSdkManager_Click);
+            // 
+            // cmdAdbTerminal
+            // 
+            this.cmdAdbTerminal.Image = global::AndroUtility.Properties.Resources.adb;
+            this.cmdAdbTerminal.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cmdAdbTerminal.Name = "cmdAdbTerminal";
+            this.cmdAdbTerminal.Size = new System.Drawing.Size(97, 22);
+            this.cmdAdbTerminal.Text = "ADB terminal";
+            this.cmdAdbTerminal.Click += new System.EventHandler(this.cmdAdbTerminal_Click);
             // 
             // statusStrip1
             // 
@@ -120,6 +166,49 @@
             this.splitContainer1.Size = new System.Drawing.Size(572, 305);
             this.splitContainer1.SplitterDistance = 340;
             this.splitContainer1.TabIndex = 3;
+            // 
+            // listViewEx1
+            // 
+            this.listViewEx1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5});
+            this.listViewEx1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listViewEx1.FullRowSelect = true;
+            this.listViewEx1.GridLines = true;
+            this.listViewEx1.Location = new System.Drawing.Point(0, 0);
+            this.listViewEx1.Name = "listViewEx1";
+            this.listViewEx1.Size = new System.Drawing.Size(336, 301);
+            this.listViewEx1.TabIndex = 0;
+            this.listViewEx1.UseCompatibleStateImageBehavior = false;
+            this.listViewEx1.View = System.Windows.Forms.View.Details;
+            this.listViewEx1.SelectedIndexChanged += new System.EventHandler(this.listViewEx1_SelectedIndexChanged);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Date";
+            this.columnHeader1.Width = 130;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Level";
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Declaring type";
+            this.columnHeader3.Width = 100;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Calling method";
+            this.columnHeader4.Width = 100;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Message";
+            this.columnHeader5.Width = 200;
             // 
             // tableLayoutPanel2
             // 
@@ -261,95 +350,6 @@
             this.bwReader.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwReader_DoWork);
             this.bwReader.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwReader_RunWorkerCompleted);
             // 
-            // listViewEx1
-            // 
-            this.listViewEx1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5});
-            this.listViewEx1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listViewEx1.FullRowSelect = true;
-            this.listViewEx1.GridLines = true;
-            this.listViewEx1.Location = new System.Drawing.Point(0, 0);
-            this.listViewEx1.Name = "listViewEx1";
-            this.listViewEx1.Size = new System.Drawing.Size(336, 301);
-            this.listViewEx1.TabIndex = 0;
-            this.listViewEx1.UseCompatibleStateImageBehavior = false;
-            this.listViewEx1.View = System.Windows.Forms.View.Details;
-            this.listViewEx1.SelectedIndexChanged += new System.EventHandler(this.listViewEx1_SelectedIndexChanged);
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Date";
-            this.columnHeader1.Width = 130;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Level";
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "Declaring type";
-            this.columnHeader3.Width = 100;
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Calling method";
-            this.columnHeader4.Width = 100;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.Text = "Message";
-            this.columnHeader5.Width = 200;
-            // 
-            // cmdOpenLog
-            // 
-            this.cmdOpenLog.Image = global::AndroUtility.Properties.Resources.folder_open;
-            this.cmdOpenLog.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.cmdOpenLog.Name = "cmdOpenLog";
-            this.cmdOpenLog.Size = new System.Drawing.Size(76, 22);
-            this.cmdOpenLog.Text = "Open log";
-            this.cmdOpenLog.Click += new System.EventHandler(this.cmdOpenLog_Click);
-            // 
-            // cmdSend
-            // 
-            this.cmdSend.Image = global::AndroUtility.Properties.Resources.mail_send;
-            this.cmdSend.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.cmdSend.Name = "cmdSend";
-            this.cmdSend.Size = new System.Drawing.Size(73, 22);
-            this.cmdSend.Text = "Send log";
-            this.cmdSend.Click += new System.EventHandler(this.cmdSend_Click);
-            // 
-            // cmdAbout
-            // 
-            this.cmdAbout.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.cmdAbout.Image = global::AndroUtility.Properties.Resources.info;
-            this.cmdAbout.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.cmdAbout.Name = "cmdAbout";
-            this.cmdAbout.Size = new System.Drawing.Size(60, 22);
-            this.cmdAbout.Text = "About";
-            this.cmdAbout.Click += new System.EventHandler(this.cmdAbout_Click);
-            // 
-            // cmdSdkManager
-            // 
-            this.cmdSdkManager.Image = global::AndroUtility.Properties.Resources.android;
-            this.cmdSdkManager.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.cmdSdkManager.Name = "cmdSdkManager";
-            this.cmdSdkManager.Size = new System.Drawing.Size(98, 22);
-            this.cmdSdkManager.Text = "SDK Manager";
-            this.cmdSdkManager.Click += new System.EventHandler(this.cmdSdkManager_Click);
-            // 
-            // cmdAdbTerminal
-            // 
-            this.cmdAdbTerminal.Image = global::AndroUtility.Properties.Resources.adb;
-            this.cmdAdbTerminal.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.cmdAdbTerminal.Name = "cmdAdbTerminal";
-            this.cmdAdbTerminal.Size = new System.Drawing.Size(97, 22);
-            this.cmdAdbTerminal.Text = "ADB terminal";
-            this.cmdAdbTerminal.Click += new System.EventHandler(this.cmdAdbTerminal_Click);
-            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -362,6 +362,7 @@
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AndroUtility";
+            this.Load += new System.EventHandler(this.FrmMain_Load);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);

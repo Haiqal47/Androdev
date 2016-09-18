@@ -13,7 +13,6 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -33,8 +32,6 @@ namespace AndroUtility
         public FrmMain()
         {
             InitializeComponent();
-
-            FindAndroidSdk();
         }
         
 
@@ -221,5 +218,9 @@ namespace AndroUtility
         }
         #endregion
 
+        private void FrmMain_Load(object sender, EventArgs e)
+        {
+            FindAndroidSdk();
+        }
     }
 }
