@@ -71,7 +71,7 @@ namespace Androdev.Core
 
         public void Error(string message, Exception ex)
         {
-            WriteEntry(message + "\r\n" + ex, "[ERROR] ");
+            WriteEntry(message + "\r\n" + ex.ToString(), "[ERROR] ");
         }
 
         public void Warning(string message)
