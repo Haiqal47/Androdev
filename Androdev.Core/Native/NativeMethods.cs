@@ -22,7 +22,7 @@ using System.Text;
 namespace Androdev.Core.Native
 {
     [SuppressUnmanagedCodeSecurity]
-    internal class NativeMethods
+    internal static class NativeMethods
     {
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         [DllImport("kernel32.dll")]

@@ -17,10 +17,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using Androdev.Core;
+using Androdev.Core.Installer;
 using Androdev.Core.IO;
 using Androdev.Model;
 using Androdev.View;
-using Androdev.Core.Diagostic;
 using Androdev.Localization;
 
 namespace Androdev.Presenter
@@ -45,30 +45,24 @@ namespace Androdev.Presenter
 
             var dataSource = FastIo.GetAvailiableDrives();
             _view.DrivesDataSource = dataSource;
-            for (int i = 0; i < dataSource.Length; i++)
-            {
-                if (InstallationHelpers.IsAndrodevDirectoryExist(dataSource[i].Name))
-                {
-                    _view.SelectedDriveIndex = i;
-                }
-            }
+            _view.SelectedDriveIndex = InstallationHelpers.FindAndrodevInstallation(dataSource);
 
             _bwWorker = new BackgroundWorker {WorkerReportsProgress = true};
             _bwWorker.DoWork += BwWorker_DoWork;
             _bwWorker.RunWorkerCompleted += BwWorker_RunWorkerCompleted;
             _bwWorker.ProgressChanged += BwWorker_ProgressChanged;
 
-            ConfigureUninstallButtonEventHandler();
+            ConfigureDelegates();
         }
         
-        #region BackgroundWorker
+        #region BackgroundWorker Subscriber
         private void BwWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             _model.UninstallButtonEnabled = true;
             _model.CboDrivesEnabled = true;
         }
 
-        private void BwWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BwWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
             _model.FileName = Commons.ElipsisText(e.UserState.ToString());
         }
@@ -77,6 +71,7 @@ namespace Androdev.Presenter
         {
             try
             {
+                // delete old files
                 var deletePath = Path.Combine(e.Argument.ToString(), "Androdev");
                 using (var enumer = FastIo.EnumerateFiles(deletePath, SearchOption.AllDirectories).GetEnumerator())
                 {
@@ -87,6 +82,8 @@ namespace Androdev.Presenter
                         _bwWorker.ReportProgress(10, enumer.Current.Name);
                     }
                 }
+
+                // delete old directory
                 Directory.Delete(deletePath, true);
                 _bwWorker.ReportProgress(100, "Androdev successfully uninstalled.");
             }
@@ -101,27 +98,29 @@ namespace Androdev.Presenter
         #region Delegates
         public EventHandler StartUninstallationEventHandler;
 
-        private void ConfigureUninstallButtonEventHandler()
+        private void ConfigureDelegates()
         {
-            StartUninstallationEventHandler = delegate(object sender, EventArgs args)
-            {
-                if (!InstallationHelpers.IsAndrodevDirectoryExist(_view.SelectedDriveName))
-                {
-                    Logger.Debug("Existing Androdev installation not found.");
-                    MessageBox.Show(TextResource.NoExistingInstallationText, TextResource.NoExistingInstallationTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    return;
-                }
-                if (MessageBox.Show(TextResource.UninstallConfirmationText, TextResource.UninstallConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
-                {
-                    Logger.Debug("User cancelled uninstallation.");
-                    return;
-                }
+            StartUninstallationEventHandler = StartUninstallationClick_Handler;
+        }
 
-                if (_bwWorker.IsBusy) return;
-                Logger.Debug("User started Androdev uninstallation.");
-                _bwWorker.RunWorkerAsync(_view.SelectedDriveName);
-                _model.UninstallButtonEnabled = false;
-            };
+        private void StartUninstallationClick_Handler(object sender, EventArgs e)
+        {
+            if (!InstallationHelpers.IsAndrodevExist(_view.SelectedDriveName))
+            {
+                Logger.Debug("Existing Androdev installation not found.");
+                MessageBox.Show(TextResource.NoExistingInstallationText, TextResource.NoExistingInstallationTitle, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+            if (MessageBox.Show(TextResource.UninstallConfirmationText, TextResource.UninstallConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+            {
+                Logger.Debug("User cancelled uninstallation.");
+                return;
+            }
+
+            if (_bwWorker.IsBusy) return;
+            Logger.Debug("User started Androdev uninstallation.");
+            _bwWorker.RunWorkerAsync(_view.SelectedDriveName);
+            _model.UninstallButtonEnabled = false;
         }
         #endregion
 

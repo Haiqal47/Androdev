@@ -46,6 +46,7 @@ namespace Androdev.Presenter
             _installManager.InstallStarted += InstallManager_InstallStarted;
 
             ConfigureDelegates();
+            _installManager.UseAutomatedConfig();
         }
 
         #region Install Manager Subscriber
@@ -56,9 +57,9 @@ namespace Androdev.Presenter
             ResetProgressBars();
         }
 
-        private void InstallManager_InstallProgressChanged(object sender, InstallProgressChangedEventArgs e)
+        private void InstallManager_InstallProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            var invoker = new Action<InstallProgressChangedEventArgs>(args =>
+            var invoker = new Action<ProgressChangedEventArgs>(args =>
             {
                 _model.ProgressStyle = (args.CurrentProgressPercentage == 99 ? ProgressBarStyle.Marquee : ProgressBarStyle.Blocks);
                 _model.CurrentProgressPercentage = args.CurrentProgressPercentage;
@@ -111,14 +112,14 @@ namespace Androdev.Presenter
 
         private void ConfigureDelegates()
         {
-            SetupClickEventHandler = InstallHandler;
-            UpdatePackagesClickEventHandler = UpdatePackagesHandler;
-            SettingsClickEventHandler = SettingsClickHandler;
-            HelpClickEventHandler = HelpHandler;
-            AboutClickEventHandler = AboutHandler;
+            SetupClickEventHandler = SetupClick_Handler;
+            UpdatePackagesClickEventHandler = UpdatePackagesClick_Handler;
+            SettingsClickEventHandler = SettingsClick_Handler;
+            HelpClickEventHandler = HelpClick_Handler;
+            AboutClickEventHandler = AboutClick_Handler;
         }
 
-        private void InstallHandler(object sender, EventArgs e)
+        private void SetupClick_Handler(object sender, EventArgs e)
         {
             switch (_model.SetupButtonImageIndex)
             {
@@ -136,7 +137,7 @@ namespace Androdev.Presenter
             }
         }
 
-        private void UpdatePackagesHandler(object sender, EventArgs e)
+        private void UpdatePackagesClick_Handler(object sender, EventArgs e)
         {
             if (MessageBox.Show(TextResource.UpdateConfirmationText, TextResource.UpdateConfirmationTitle, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
                 return;
@@ -148,7 +149,7 @@ namespace Androdev.Presenter
             }
         }
 
-        private void SettingsClickHandler(object sender, EventArgs e)
+        private void SettingsClick_Handler(object sender, EventArgs e)
         {
             using (var frm = new InstallConfigDialog())
             {
@@ -171,12 +172,12 @@ namespace Androdev.Presenter
             }
         }
 
-        private void HelpHandler(object sender, EventArgs e)
+        private void HelpClick_Handler(object sender, EventArgs e)
         {
             MessageBox.Show(TextResource.HelpUnderConstructionText, TextResource.HelpUnderConstructionTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void AboutHandler(object sender, EventArgs e)
+        private void AboutClick_Handler(object sender, EventArgs e)
         {
             using (var frm = new AboutDialog())
             {
@@ -193,9 +194,9 @@ namespace Androdev.Presenter
             if (!_disposedValue) return;
             if (disposing)
             {
-                if (_installManager != null) _installManager.Dispose();
+                _installManager?.Dispose();
             }
-            
+
             _disposedValue = true;
         }
 

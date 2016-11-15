@@ -18,8 +18,11 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 
-namespace Androdev.Core.Diagostic
+namespace Androdev.Core.IO
 {
+    /// <summary>
+    /// Provides <see cref="Process"/> helper methods.
+    /// </summary>
     public static class ProcessHelper
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();

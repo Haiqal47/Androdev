@@ -42,12 +42,8 @@ namespace Androdev.Core.IO
 
         public string FullPath { get; }
         #endregion
-
-        public override string ToString()
-        {
-            return Name;
-        }
-
+        
+        #region Constructor
         internal FileData(string dir, WIN32_FIND_DATA findData)
         {
             Attributes = findData.dwFileAttributes;
@@ -58,7 +54,9 @@ namespace Androdev.Core.IO
             Name = findData.cFileName;
             FullPath = Path.Combine(dir, findData.cFileName).TrimEnd(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
         }
+        #endregion
 
+        #region Methods
         private static long CombineHighLowInts(uint high, uint low)
         {
             return (((long)high) << 0x20) | low;
@@ -69,5 +67,11 @@ namespace Androdev.Core.IO
             var fileTime = CombineHighLowInts(high, low);
             return DateTime.FromFileTimeUtc(fileTime);
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+        #endregion
     }
 }

@@ -25,8 +25,13 @@ namespace Androdev.Core.IO
     public static class FastIo
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        //private const string UnicodePrefix = @"\\?\";
 
+        /// <summary>
+        /// Enumerate files inside directory.
+        /// </summary>
+        /// <param name="path">Fullpath to directory to be analyzed.</param>
+        /// <param name="option">Specifies recrusive search or top level only search.</param>
+        /// <returns><see cref="IEnumerable{FileData}"/> object.</returns>
         public static IEnumerable<FileData> EnumerateFiles(string path, SearchOption option)
         {
             if (path == null)
@@ -73,6 +78,10 @@ namespace Androdev.Core.IO
             }
         }
 
+        /// <summary>
+        /// Get availiable drives.
+        /// </summary>
+        /// <returns><see cref="DriveInfo"/> array.</returns>
         public static DriveInfo[] GetAvailiableDrives()
         {
             var drives = DriveInfo.GetDrives();
@@ -94,6 +103,10 @@ namespace Androdev.Core.IO
             return dataSource.Count > 0 ? dataSource.ToArray() : null;
         }
 
+        /// <summary>
+        /// Create shortcut using specified <see cref="ShortcutProperties"/> information.
+        /// </summary>
+        /// <param name="properties"></param>
         public static void CreateShortcut(ShortcutProperties properties)
         {
             try

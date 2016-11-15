@@ -20,7 +20,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Androdev.Core.Diagostic;
+using Androdev.Core.Installer;
 using Androdev.Core.IO;
 
 namespace AndroUtility
@@ -107,7 +107,7 @@ namespace AndroUtility
             for (int i = 0; i < drives.Length; i++)
             {
                 var currentDrive = drives[i].Name;
-                if (!InstallationHelpers.IsAndrodevDirectoryExist(currentDrive)) continue;
+                if (!InstallationHelpers.IsAndrodevExist(currentDrive)) continue;
 
                 _androidSdkPath = Path.Combine(currentDrive, "Androdev\\android-sdk");
                 if (Directory.Exists(_androidSdkPath))

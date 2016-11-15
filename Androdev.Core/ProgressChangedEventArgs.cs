@@ -16,7 +16,7 @@ using System;
 
 namespace Androdev.Core
 {
-    public class InstallProgressChangedEventArgs : EventArgs
+    public class ProgressChangedEventArgs : EventArgs
     {
         public int OverallProgressPercentage { get; set; }
         public int CurrentProgressPercentage { get; set; }

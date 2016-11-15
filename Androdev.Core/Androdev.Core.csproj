@@ -39,12 +39,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons.cs" />
-    <Compile Include="Diagostic\InstallationHelpers.cs" />
-    <Compile Include="Diagostic\Manifester.cs" />
-    <Compile Include="Diagostic\ProcessHelper.cs" />
-    <Compile Include="EclipseConfigurator.cs" />
+    <Compile Include="Installer\EclipseCommandBuilder.cs" />
+    <Compile Include="Installer\InstallationHelpers.cs" />
+    <Compile Include="Installer\PackageInstaller.cs" />
+    <Compile Include="IO\ProcessHelper.cs" />
+    <Compile Include="Installer\EclipseConfigurator.cs" />
     <Compile Include="InstallManager.cs" />
-    <Compile Include="InstallProgressChangedEventArgs.cs" />
+    <Compile Include="ProgressChangedEventArgs.cs" />
     <Compile Include="IO\FastIo.cs" />
     <Compile Include="IO\FileData.cs" />
     <Compile Include="IO\ShortcutProperties.cs" />

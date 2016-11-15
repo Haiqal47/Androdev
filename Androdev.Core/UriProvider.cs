@@ -16,10 +16,10 @@ namespace Androdev.Core
 {
     public static class UriProvider
     {
-        public static readonly string AndroidSdkTools = "https://dl.google.com/android/android-sdk_r24.1.2-windows.zip";
-        public static readonly string JavaDevelopmentKit = "http://download.oracle.com/otn-pub/java/jdk/8u101-b13/jdk-8u101-windows-i586.exe";
-        public static readonly string AndroidDeveloperTools = "https://dl.google.com/android/ADT-23.0.7.zip";
-        public static readonly string EclipseMars2 = "http://eclipse.mirror.rafal.ca/technology/epp/downloads/release/mars/2/eclipse-java-mars-2-win32.zip";
+        private const string AndroidSdkTools = "https://dl.google.com/android/android-sdk_r24.1.2-windows.zip";
+        private const string JavaDevelopmentKit = "http://download.oracle.com/otn-pub/java/jdk/8u101-b13/jdk-8u101-windows-i586.exe";
+        private const string AndroidDeveloperTools = "https://dl.google.com/android/ADT-23.0.7.zip";
+        private const string EclipseMars2 = "http://eclipse.mirror.rafal.ca/technology/epp/downloads/release/mars/2/eclipse-java-mars-2-win32.zip";
 
         public static string GetUrlByIndex(int index)
         {

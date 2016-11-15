@@ -13,26 +13,41 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Androdev.Core
 {
+    /// <summary>
+    /// Provides common tasks.
+    /// </summary>
     public static class Commons
     {
         public const int Wait15MinMilis = 900000;
         
+        /// <summary>
+        /// Gets current desktop path.
+        /// </summary>
+        /// <returns>Fullpath to user desktop.</returns>
         public static string GetDesktopPath()
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
 
+        /// <summary>
+        /// Gets current AppDomain base path.
+        /// </summary>
+        /// <returns>Fullpath to current AppDomain location.</returns>
         public static string GetBaseDirectoryPath()
         {
             return AppDomain.CurrentDomain.BaseDirectory;
         }
 
+        /// <summary>
+        /// Trim long text using elipsis.
+        /// </summary>
+        /// <param name="originalText">Original text to trim.</param>
+        /// <param name="neededLength">Maximum output text length.</param>
+        /// <returns></returns>
         public static string ElipsisText(string originalText, int neededLength = 32)
         {
             const string delimiter = "...";
@@ -58,6 +73,11 @@ namespace Androdev.Core
             }
         }
 
+        /// <summary>
+        /// Converts file size unit from bytes to nearest friendly file size.
+        /// </summary>
+        /// <param name="byteCount">Number of file size to convert.</param>
+        /// <returns>Friendly file size.</returns>
         public static string RoundByteSize(long byteCount)
         {
             string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
@@ -66,9 +86,14 @@ namespace Androdev.Core
             var bytes = Math.Abs(byteCount);
             var place = Convert.ToInt32(Math.Floor(Math.Log(byteCount, 1024)));
             var num = Math.Round(bytes / Math.Pow(1024, place), 2);
-            return String.Format("{0} {1}", (Math.Sign(byteCount) * num), suf[place]);
+            return $"{Math.Sign(byteCount)*num} {suf[place]}";
         }
 
+        /// <summary>
+        /// Gets file name from given <see cref="Uri"/>.
+        /// </summary>
+        /// <param name="uriPath"><see cref="Uri"/> object to file.</param>
+        /// <returns>Filename from <see cref="Uri"/> object.</returns>
         public static string GetFilenameFromUri(Uri uriPath)
         {
             var relativePath = uriPath.AbsolutePath;
@@ -78,6 +103,11 @@ namespace Androdev.Core
             return newpath;
         }
 
+        /// <summary>
+        /// Converts path to Eclipse compliant path format.
+        /// </summary>
+        /// <param name="origPath">Original path to convert.</param>
+        /// <returns>Eclipse compliant path format.</returns>
         public static string ToEclipseCompliantPath(string origPath)
         {
             var driveRootChar = origPath.Substring(0, 1);
@@ -88,24 +118,6 @@ namespace Androdev.Core
             sb.Append(relativePath.Replace("\\", "\\\\"));
             return sb.ToString();
         }
-
-        [Obsolete]
-        public static bool CompareSha1Hash(string filePath, string hash)
-        {
-            StringBuilder formatted = new StringBuilder(2 * hash.Length);
-            BufferedStream bs = new BufferedStream(File.OpenRead(filePath));
-            SHA1Managed sha1 = new SHA1Managed();
-
-            byte[] fileHash = sha1.ComputeHash(bs);
-            foreach (byte b in fileHash)
-            {
-                formatted.AppendFormat("{0:X2}", b);
-            }
-
-            bs.Close();
-            sha1.Clear();
-
-            return hash == formatted.ToString();
-        }
+        
     }
 }

@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Androdev", "Androdev\Androd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Androdev.Core", "Androdev.Core\Androdev.Core.csproj", "{FB18CE3D-A06B-4450-B8F7-1565531C4290}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Androdev.Sandbox", "Androdev.Sandbox\Androdev.Sandbox.csproj", "{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7233FEC8-2237-4CDA-AC4C-F9C86406F45B}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
@@ -34,10 +32,6 @@ Global
 		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Debug|x86.Build.0 = Debug|x86
 		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Release|x86.ActiveCfg = Release|x86
 		{FB18CE3D-A06B-4450-B8F7-1565531C4290}.Release|x86.Build.0 = Release|x86
-		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Debug|x86.ActiveCfg = Debug|x86
-		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Debug|x86.Build.0 = Debug|x86
-		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Release|x86.ActiveCfg = Release|x86
-		{8C6C92F9-1623-4D35-80A7-A44F5C2EF792}.Release|x86.Build.0 = Release|x86
 		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Debug|x86.ActiveCfg = Debug|x86
 		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Debug|x86.Build.0 = Debug|x86
 		{FDF3D1E7-B1CF-4142-AF36-2A31A8F11DCD}.Release|x86.ActiveCfg = Release|x86
