@@ -18,9 +18,25 @@ using Androdev.Core.Native;
 
 namespace Androdev.Core.IO
 {
+    /// <summary>
+    /// File informations.
+    /// </summary>
     [Serializable]
     public class FileData
     {
+        #region Constructor
+        internal FileData(string dir, WIN32_FIND_DATA findData)
+        {
+            Attributes = findData.dwFileAttributes;
+            CreationTimeUtc = ConvertDateTime(findData.ftCreationTime_dwHighDateTime, findData.ftCreationTime_dwLowDateTime);
+            LastAccessTimeUtc = ConvertDateTime(findData.ftLastAccessTime_dwHighDateTime, findData.ftLastAccessTime_dwLowDateTime);
+            LastWriteTimeUtc = ConvertDateTime(findData.ftLastWriteTime_dwHighDateTime, findData.ftLastWriteTime_dwLowDateTime);
+            Size = CombineHighLowInts(findData.nFileSizeHigh, findData.nFileSizeLow);
+            Name = findData.cFileName;
+            FullPath = Path.Combine(dir, findData.cFileName).TrimEnd(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+        }
+        #endregion
+
         #region Properties
         public FileAttributes Attributes { get; }
 
@@ -42,20 +58,7 @@ namespace Androdev.Core.IO
 
         public string FullPath { get; }
         #endregion
-        
-        #region Constructor
-        internal FileData(string dir, WIN32_FIND_DATA findData)
-        {
-            Attributes = findData.dwFileAttributes;
-            CreationTimeUtc = ConvertDateTime(findData.ftCreationTime_dwHighDateTime, findData.ftCreationTime_dwLowDateTime);
-            LastAccessTimeUtc = ConvertDateTime(findData.ftLastAccessTime_dwHighDateTime, findData.ftLastAccessTime_dwLowDateTime);
-            LastWriteTimeUtc = ConvertDateTime(findData.ftLastWriteTime_dwHighDateTime, findData.ftLastWriteTime_dwLowDateTime);
-            Size = CombineHighLowInts(findData.nFileSizeHigh, findData.nFileSizeLow);
-            Name = findData.cFileName;
-            FullPath = Path.Combine(dir, findData.cFileName).TrimEnd(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-        }
-        #endregion
-
+       
         #region Methods
         private static long CombineHighLowInts(uint high, uint low)
         {

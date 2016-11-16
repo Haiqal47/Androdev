@@ -40,6 +40,8 @@ namespace Androdev.Core
         private ExtractProcessInfo _extractInfo;
         private int _extractedFile;
         private readonly BackgroundWorker _bwWorker;
+        private string _installRoot;
+        private bool _uacCompatibility;
 
         #region Constructor
         public InstallManager()
@@ -52,35 +54,75 @@ namespace Androdev.Core
         #endregion
 
         #region Properties
-        public string InstallRoot { get; private set; }
+        /// <summary>
+        /// Drive root path.
+        /// </summary>
+        public string InstallRoot
+        {
+            get { return _installRoot; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentException("Argument is null or empty", nameof(InstallRoot));
 
-        public bool UacCompatibility { get; private set; }
+                _installRoot = value;
+                Logger.Debug("Changed install path to " + InstallPath);
+            }
+        }
+
+        /// <summary>
+        /// Enable/disable manifest creation.
+        /// </summary>
+        public bool UacCompatibility
+        {
+            get { return _uacCompatibility; }
+            set
+            {
+                _uacCompatibility = value;
+                Logger.Debug("UAC Compatibility state: " + value);
+            }
+        }
         #endregion
 
         #region Protected Properties
-        public string InstallDirectory
+        /// <summary>
+        /// Androdev install directory ([InstallRoot]\Androdev);
+        /// </summary>
+        private string InstallPath
         {
             get { return Path.Combine(InstallRoot, "Androdev"); }
         }
 
-        public string EclipsePath
+        /// <summary>
+        /// Eclipse install directory ([InstallRoot]\Androdev\eclipse);
+        /// </summary>
+        private string EclipsePath
         {
-            get { return Path.Combine(InstallDirectory, "eclipse"); }
+            get { return Path.Combine(InstallPath, "eclipse"); }
         }
 
-        public string EclipsecFilePath
+        /// <summary>
+        /// eclipsec.exe file path ([InstallRoot]\eclipse\eclipsec.exe);
+        /// </summary>
+        private string EclipsecFilePath
         {
-            get { return Path.Combine(InstallDirectory, "eclipse\\eclipsec.exe"); }
+            get { return Path.Combine(InstallPath, "eclipse\\eclipsec.exe"); }
         }
 
-        public string EclipseWorkspacePath
+        /// <summary>
+        /// Eclipse workspace directory ([InstallRoot]\Androdev\workspace);
+        /// </summary>
+        private string EclipseWorkspacePath
         {
-            get { return Path.Combine(InstallDirectory, "workspace"); }
+            get { return Path.Combine(InstallPath, "workspace"); }
         }
 
-        public string AndroidSdkPath
+        /// <summary>
+        /// Android SDK directory ([InstallRoot]\Androdev\android-sdk);
+        /// </summary>
+        private string AndroidSdkPath
         {
-            get { return Path.Combine(InstallDirectory, "android-sdk"); }
+            get { return Path.Combine(InstallPath, "android-sdk"); }
         }
         #endregion
 
@@ -90,96 +132,7 @@ namespace Androdev.Core
         public event EventHandler InstallFinished;
         #endregion
 
-        #region Methods
-        public void BeginInstall()
-        {
-            if (_bwWorker.IsBusy)
-            {
-                throw new InvalidOperationException("Thread is busy!");
-            }
-
-            InstallStarted?.Invoke(this, EventArgs.Empty);
-            _bwWorker.RunWorkerAsync();
-            Logger.Debug("Install process started.");
-        }
-
-        public void EndInstall()
-        {
-            if (!_bwWorker.IsBusy) return;
-            Logger.Debug("Stopping install process.");
-            _bwWorker.CancelAsync();
-        }
-
-        public void UseAutomatedConfig()
-        {
-            // find instal directory
-            var systemDisk = Path.GetPathRoot(Environment.SystemDirectory);
-            Logger.Debug("System disk: " + systemDisk);
-
-            var installDrive = systemDisk;
-            var drives = FastIo.GetAvailiableDrives();
-            for (var i = 0; i < drives.Length; i++)
-            {
-                // is system disk?
-                if (systemDisk.StartsWith(drives[i].Name)) continue;
-
-                // the choosen one
-                installDrive = drives[i].Name;
-                Logger.Info("Androdev install location selected. Drive " + installDrive);
-                break;
-            }
-
-            // use current config
-            InstallRoot = installDrive;
-            UacCompatibility = (installDrive == systemDisk);
-        }
-
-        public void SetInstallRoot(string driveRoot)
-        {
-            if (string.IsNullOrEmpty(driveRoot))
-            {
-                throw new ArgumentException("Argument is null or empty", nameof(driveRoot));
-            }
-
-            InstallRoot = driveRoot;
-            Logger.Debug("Changed install path to " + InstallDirectory);
-        }
-
-        public void SetUacCompatibility(bool enabled)
-        {
-            UacCompatibility = enabled;
-            Logger.Debug("UAC Compatibility state: " + UacCompatibility.ToString());
-        }
-        
-        private void OnProcessFile(object sender, ScanEventArgs args)
-        {
-            // check for cancellation
-            args.ContinueRunning = !_bwWorker.CancellationPending;
-            if (!args.ContinueRunning) return;
-
-            // use Interlocked as atomic operation
-            Interlocked.Increment(ref _extractedFile);
-            var currentProgress = Interlocked.CompareExchange(ref _extractedFile, 0, 0) / _extractInfo.TotalFiles * 100;
-            var overallProgress = (int)(currentProgress / 100 * 12) + _extractInfo.PercentageIncrement ;
-            var currentFile = "Extracting: " + Commons.ElipsisText(Path.GetFileName(args.Name));
-
-            // report progress
-            WorkerReportProgress(overallProgress, Convert.ToInt32(currentProgress), _extractInfo.StatusText, currentFile);
-        }
-        #endregion
-
-        #region Thread Worker
-        private void WorkerReportProgress(int arg1, int arg2, string arg3, string arg4 = "")
-        {
-            InstallProgressChanged?.Invoke(this, new ProgressChangedEventArgs()
-            {
-                OverallProgressPercentage = arg1,
-                CurrentProgressPercentage = arg2,
-                StatusText = arg3,
-                ExtraStatusText = arg4,
-            });
-        }
-
+        #region Thread Worker Subscriber
         private void BwWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             InstallFinished?.Invoke(this, EventArgs.Empty);
@@ -187,7 +140,7 @@ namespace Androdev.Core
 
         private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // before step - check for dependecies
+            // check for dependecies
             if (!InstallationHelpers.CheckDependecies())
             {
                 WorkerReportProgress(0, 0, "Dependecies missing!", "Click [Update] to download necessary items.");
@@ -195,7 +148,7 @@ namespace Androdev.Core
                 return;
             }
 
-            // before step - check existing installation
+            // check existing installation
             if (InstallationHelpers.IsAndrodevExist(InstallRoot))
             {
                 WorkerReportProgress(0, 0, "Existing installation detected.", "Please remove existing Androdev installation.");
@@ -225,11 +178,10 @@ namespace Androdev.Core
 
             // step 5 - install ADT
             Install_ADT();
-            if (_bwWorker.CancellationPending) return; // cancellation boundary
 
             // step 6 - configure Eclipse
             Install_ConfigureEclipse();
-            
+
             // step 7 - create shortcuts
             Install_Shortcuts();
 
@@ -238,8 +190,91 @@ namespace Androdev.Core
             Logger.Info("Androdev has been installed successfully.");
         }
         #endregion
+
+        #region Methods
+        /// <summary>
+        /// Starts installation process.
+        /// </summary>
+        public void BeginInstall()
+        {
+            if (_bwWorker.IsBusy)
+                throw new InvalidOperationException("Thread is busy!");
+
+            InstallStarted?.Invoke(this, EventArgs.Empty);
+            _bwWorker.RunWorkerAsync();
+            Logger.Debug("Install process started.");
+        }
+        /// <summary>
+        /// Stops installation process.
+        /// </summary>
+        public void EndInstall()
+        {
+            if (!_bwWorker.IsBusy) return;
+            Logger.Debug("Stopping install process.");
+            _bwWorker.CancelAsync();
+        }
+        /// <summary>
+        /// Automatically select best install parameter.
+        /// </summary>
+        public void UseAutomatedConfig()
+        {
+            // find instal directory
+            var systemDisk = Path.GetPathRoot(Environment.SystemDirectory);
+            Logger.Debug("System disk: " + systemDisk);
+
+            var installDrive = systemDisk;
+            var drives = FastIo.GetAvailiableDrives();
+            for (var i = 0; i < drives.Length; i++)
+            {
+                // is system disk?
+                if (systemDisk.StartsWith(drives[i].Name)) continue;
+
+                // the choosen one
+                installDrive = drives[i].Name;
+                Logger.Info("Androdev install location selected. Drive " + installDrive);
+                break;
+            }
+
+            // use current config
+            InstallRoot = installDrive;
+            UacCompatibility = (installDrive == systemDisk);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <param name="arg3"></param>
+        /// <param name="arg4"></param>
+        private void WorkerReportProgress(int arg1, int arg2, string arg3, string arg4 = "")
+        {
+            InstallProgressChanged?.Invoke(this, new ProgressChangedEventArgs()
+            {
+                OverallProgressPercentage = arg1,
+                CurrentProgressPercentage = arg2,
+                StatusText = arg3,
+                ExtraStatusText = arg4,
+            });
+        }
+
+        private void OnProcessFile(object sender, ScanEventArgs args)
+        {
+            // check for cancellation
+            args.ContinueRunning = !_bwWorker.CancellationPending;
+            if (!args.ContinueRunning) return;
+
+            // use Interlocked as atomic operation
+            Interlocked.Increment(ref _extractedFile);
+            var currentProgress = Interlocked.CompareExchange(ref _extractedFile, 0, 0) / _extractInfo.TotalFiles * 100;
+            var overallProgress = (int)(currentProgress / 100 * 12) + _extractInfo.PercentageIncrement ;
+            var currentFile = "Extracting: " + Commons.ElipsisText(Path.GetFileName(args.Name));
+
+            // report progress
+            WorkerReportProgress(overallProgress, Convert.ToInt32(currentProgress), _extractInfo.StatusText, currentFile);
+        }
+        #endregion
        
-        #region Core Installation Features
+        #region Core Installation Methods
         private void Install_JavaDevelopmentKit()
         {
             Logger.Info("==========Java Development Kit [Started]===========");
@@ -378,7 +413,7 @@ namespace Androdev.Core
 
                 // extract files
                 var eclipseZip = new FastZip(zipEvents);
-                eclipseZip.ExtractZip(InstallationHelpers.EclipseIdePath, InstallDirectory, FastZip.Overwrite.Always, name => true, null, null, true);
+                eclipseZip.ExtractZip(InstallationHelpers.EclipseIdePath, InstallPath, FastZip.Overwrite.Always, name => true, null, null, true);
 
                 Logger.Debug("Eclipse IDE installed.");
             }
@@ -390,7 +425,7 @@ namespace Androdev.Core
             }
 
             // do post installation
-            PackageInstaller.EclipsePostInstall(InstallDirectory, EclipseWorkspacePath);
+            PackageInstaller.EclipsePostInstall(InstallPath, EclipseWorkspacePath);
 
             Logger.Debug("Eclipse configuration initialized successfully.");
             Logger.Info("==========Eclipse Mars 2 IDE [Finished]===========");
@@ -402,19 +437,19 @@ namespace Androdev.Core
             WorkerReportProgress(56, 63, "Creating manifest...");
 
             // create manifest for SDK Manager
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallDirectory, "android-sdk\\SDK Manager.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "android-sdk\\SDK Manager.exe.manifest"));
             Logger.Debug("Manifest added to SDK Manager.");
 
             // create manifest for AVD Manager
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallDirectory, "android-sdk\\AVD Manager.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "android-sdk\\AVD Manager.exe.manifest"));
             Logger.Debug("Manifest added to AVD Manager.");
 
             // create manifest for Eclipse IDE
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallDirectory, "eclipse\\eclipse.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "eclipse\\eclipse.exe.manifest"));
             Logger.Debug("Manifest added to Eclipse IDE.");
 
             // create manifest for Eclipse Command Line
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallDirectory, "eclipse\\eclipsec.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "eclipse\\eclipsec.exe.manifest"));
             Logger.Debug("Manifest added to Eclipse Command Line.");
 
             WorkerReportProgress(56, 100, "Manifest installed.");
@@ -447,7 +482,7 @@ namespace Androdev.Core
             WorkerReportProgress(70, 63, "Configuring Eclipse IDE...");
 
             // variables
-            var eclipseConfigService = new EclipseConfigurator(InstallDirectory);
+            var eclipseConfigService = new EclipseConfigurator(InstallPath);
 
             // configure SDK path
             if (!eclipseConfigService.ConfigureSdkPath(AndroidSdkPath))
@@ -481,22 +516,22 @@ namespace Androdev.Core
 
             FastIo.CreateShortcut(new ShortcutProperties()
             {
-                Target = Path.Combine(InstallDirectory, "android-sdk\\SDK Manager.exe"),
+                Target = Path.Combine(InstallPath, "android-sdk\\SDK Manager.exe"),
                 Name = "Android SDK Tools",
                 Comment = "Launch Android SDK Tools.",
-                IconFile = Path.Combine(InstallDirectory, "android-sdk\\tools\\emulator.exe"),
+                IconFile = Path.Combine(InstallPath, "android-sdk\\tools\\emulator.exe"),
             });
 
             FastIo.CreateShortcut(new ShortcutProperties()
             {
-                Target = Path.Combine(InstallDirectory, "eclipse\\eclipse.exe"),
+                Target = Path.Combine(InstallPath, "eclipse\\eclipse.exe"),
                 Name = "Eclipse Mars for Android",
                 Comment = "Launch Eclipse Mars IDE for Android.",
             });
             
             FastIo.CreateShortcut(new ShortcutProperties()
             {
-                Target = Path.Combine(InstallDirectory, "workspace"),
+                Target = Path.Combine(InstallPath, "workspace"),
                 Name = "Eclipse Workspace",
                 Comment = "Eclipse workspace directory.",
             });
@@ -524,7 +559,7 @@ namespace Androdev.Core
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
+            //GC.SuppressFinalize(this);
         }
         #endregion
     }

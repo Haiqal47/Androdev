@@ -13,14 +13,15 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
 using System;
-using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
 
 namespace Androdev.Core.Native
 {
+    /// <summary>
+    /// Provides managed method P/Invoke signature from unmanaged methods.
+    /// </summary>
     [SuppressUnmanagedCodeSecurity]
     internal static class NativeMethods
     {

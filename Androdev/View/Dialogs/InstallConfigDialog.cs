@@ -16,6 +16,7 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using Androdev.Core;
+using Androdev.Core.Installer;
 using Androdev.Core.IO;
 using Androdev.Localization;
 
@@ -28,20 +29,6 @@ namespace Androdev.View.Dialogs
         {
             InitializeComponent();
         }
-
-        #region Methods
-        private static int FindDriveIndex(string name, DriveInfo[] list)
-        {
-            for (int i = 0; i < list.Length; i++)
-            {
-                if (list[i].Name == name)
-                {
-                    return i;
-                }
-            }
-            return 0;
-        }
-        #endregion
 
         #region Properties
         public bool UacCompatibility { get; set; }
@@ -75,10 +62,7 @@ namespace Androdev.View.Dialogs
 
             chkUAC.Checked = UacCompatibility;
             cboInstallDir.DataSource = dataSource;
-            if (InstallRoot != null)
-            {
-                cboInstallDir.SelectedIndex = FindDriveIndex(InstallRoot, dataSource);
-            }
+            cboInstallDir.SelectedIndex = InstallationHelpers.FindAndrodevInstallation(dataSource);
         }
         #endregion
 

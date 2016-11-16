@@ -21,6 +21,12 @@ namespace Androdev.Core
         private const string AndroidDeveloperTools = "https://dl.google.com/android/ADT-23.0.7.zip";
         private const string EclipseMars2 = "http://eclipse.mirror.rafal.ca/technology/epp/downloads/release/mars/2/eclipse-java-mars-2-win32.zip";
 
+        /// <summary>
+        /// Gets file URI based on index.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        /// <remarks>0 : Android SDK, 1 : JDK, 2 : ADT, 3 : Eclipse Mars 2.</remarks>
         public static string GetUrlByIndex(int index)
         {
             switch (index)

@@ -12,12 +12,12 @@
 // 
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Androdev.Core.IO
 {
+    /// <summary>
+    /// Shortcut data info.
+    /// </summary>
     public class ShortcutProperties
     {
         public string Name { get; set; }

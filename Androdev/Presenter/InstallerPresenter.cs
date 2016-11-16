@@ -159,8 +159,8 @@ namespace Androdev.Presenter
 
                 try
                 {
-                    _installManager.SetInstallRoot(frm.InstallRoot);
-                    _installManager.SetUacCompatibility(frm.UacCompatibility);
+                    _installManager.InstallRoot = frm.InstallRoot;
+                    _installManager.UacCompatibility = frm.UacCompatibility;
                     UpdateSetupButton(0, true);
                     Logger.Debug(string.Format("Install parameter changed. Root:{0}, UAC:{1}", frm.InstallRoot, frm.UacCompatibility));
                 }

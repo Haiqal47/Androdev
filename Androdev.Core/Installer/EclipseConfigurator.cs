@@ -36,29 +36,43 @@ namespace Androdev.Core.Installer
         #endregion
 
         #region Protected Properties
-        protected string EclipsePath
+        /// <summary>
+        /// Fullpath to Eclipse installation directory.
+        /// </summary>
+        private string EclipsePath
         {
             get { return Path.Combine(_installDirectory, "eclipse"); }
         }
-
-        protected string EclipsecFilePath
+        /// <summary>
+        /// Fullpath to eclipse.exe file.
+        /// </summary>
+        private string EclipsecFilePath
         {
             get { return Path.Combine(_installDirectory, "eclipse\\eclipsec.exe"); }
         }
-
-        protected string EclipseWorkspacePath
+        /// <summary>
+        /// Fullpath to Eclipse Workspace directory.
+        /// </summary>
+        private string EclipseWorkspacePath
         {
             get { return Path.Combine(_installDirectory, "workspace"); }
         }
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Initialize Eclipse configuration for the first time.
+        /// </summary>
+        /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public bool InitializeEclipseConfiguration()
         {
             return ProcessHelper.RunAndWait(EclipsecFilePath, EclipseCommandBuilder.Build_PrepareConfigArgument());
         }
-        
+        /// <summary>
+        /// Configures Eclipse worksapce path.
+        /// </summary>
+        /// <returns></returns>
         public bool ConfigureWorkspaceDirectory()
         {
             try
@@ -74,7 +88,11 @@ namespace Androdev.Core.Installer
                 return false;
             }
         }
-        
+        /// <summary>
+        /// Configures ADT's Android SDK path.
+        /// </summary>
+        /// <param name="androidSdkPath"></param>
+        /// <returns></returns>
         public bool ConfigureSdkPath(string androidSdkPath)
         {
             try
@@ -90,7 +108,10 @@ namespace Androdev.Core.Installer
                 return false;
             }
         }
-
+        /// <summary>
+        /// Configure Code Assist activation trigger.
+        /// </summary>
+        /// <returns></returns>
         public bool ConfigureCodeAssist()
         {
             try

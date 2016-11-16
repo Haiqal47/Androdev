@@ -17,8 +17,11 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Androdev.Core.Native
 {
+    /// <summary>
+    /// Wrap unmanaged find handle.
+    /// </summary>
     [SecurityPermission(SecurityAction.InheritanceDemand, UnmanagedCode = true)]
-    public class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         internal SafeFindHandle() : base(true)
         {

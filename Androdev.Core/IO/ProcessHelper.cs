@@ -27,6 +27,13 @@ namespace Androdev.Core.IO
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
 
+        /// <summary>
+        /// Execute specified file and wait for exit. Listen to stdout and match it with given condition.
+        /// </summary>
+        /// <param name="filePath">Fullpath to file to be executed.</param>
+        /// <param name="cmdLine">Additional command-line parameter.</param>
+        /// <param name="ouputTextShouldTrue">Text to compare at end of execution.</param>
+        /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool RunAndWait(string filePath, string cmdLine, string ouputTextShouldTrue)
         {
@@ -89,6 +96,12 @@ namespace Androdev.Core.IO
             }
         }
 
+        /// <summary>
+        /// Execute specified file and wait for exit.
+        /// </summary>
+        /// <param name="filePath">Fullpath to file to be executed.</param>
+        /// <param name="cmdLine">Additional command-line parameter.</param>
+        /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool RunAndWait(string filePath, string cmdLine)
         {
