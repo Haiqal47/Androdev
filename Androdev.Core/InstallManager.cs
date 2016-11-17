@@ -47,9 +47,14 @@ namespace Androdev.Core
         public InstallManager()
         {
             // configure BGW
-            _bwWorker = new BackgroundWorker { WorkerSupportsCancellation = true };
+            _bwWorker = new BackgroundWorker
+            {
+                WorkerSupportsCancellation = true,
+                WorkerReportsProgress = true,
+            };
             _bwWorker.DoWork += BwWorker_DoWork;
             _bwWorker.RunWorkerCompleted += BwWorker_RunWorkerCompleted;
+            _bwWorker.ProgressChanged += BwWorker_ProgressChanged;
         }
         #endregion
 
@@ -69,7 +74,6 @@ namespace Androdev.Core
                 Logger.Debug("Changed install path to " + InstallPath);
             }
         }
-
         /// <summary>
         /// Enable/disable manifest creation.
         /// </summary>
@@ -84,7 +88,7 @@ namespace Androdev.Core
         }
         #endregion
 
-        #region Protected Properties
+        #region Private Properties
         /// <summary>
         /// Androdev install directory ([InstallRoot]\Androdev);
         /// </summary>
@@ -92,7 +96,6 @@ namespace Androdev.Core
         {
             get { return Path.Combine(InstallRoot, "Androdev"); }
         }
-
         /// <summary>
         /// Eclipse install directory ([InstallRoot]\Androdev\eclipse);
         /// </summary>
@@ -100,7 +103,6 @@ namespace Androdev.Core
         {
             get { return Path.Combine(InstallPath, "eclipse"); }
         }
-
         /// <summary>
         /// eclipsec.exe file path ([InstallRoot]\eclipse\eclipsec.exe);
         /// </summary>
@@ -108,7 +110,6 @@ namespace Androdev.Core
         {
             get { return Path.Combine(InstallPath, "eclipse\\eclipsec.exe"); }
         }
-
         /// <summary>
         /// Eclipse workspace directory ([InstallRoot]\Androdev\workspace);
         /// </summary>
@@ -116,7 +117,6 @@ namespace Androdev.Core
         {
             get { return Path.Combine(InstallPath, "workspace"); }
         }
-
         /// <summary>
         /// Android SDK directory ([InstallRoot]\Androdev\android-sdk);
         /// </summary>
@@ -128,7 +128,7 @@ namespace Androdev.Core
 
         #region Events
         public event EventHandler InstallStarted;
-        public event EventHandler<ProgressChangedEventArgs> InstallProgressChanged;
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
         public event EventHandler InstallFinished;
         #endregion
 
@@ -136,6 +136,11 @@ namespace Androdev.Core
         private void BwWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             InstallFinished?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void BwWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            ProgressChanged?.Invoke(this, (ProgressChangedEventArgs)e.UserState);
         }
 
         private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -240,23 +245,22 @@ namespace Androdev.Core
             UacCompatibility = (installDrive == systemDisk);
         }
         /// <summary>
-        /// 
+        /// Report progress to view.
         /// </summary>
-        /// <param name="arg1"></param>
-        /// <param name="arg2"></param>
-        /// <param name="arg3"></param>
-        /// <param name="arg4"></param>
-        private void WorkerReportProgress(int arg1, int arg2, string arg3, string arg4 = "")
+        private void WorkerReportProgress(int overall, int current, string status, string desc = "")
         {
-            InstallProgressChanged?.Invoke(this, new ProgressChangedEventArgs()
+            var state = new ProgressChangedEventArgs()
             {
-                OverallProgressPercentage = arg1,
-                CurrentProgressPercentage = arg2,
-                StatusText = arg3,
-                ExtraStatusText = arg4,
-            });
+                OverallProgressPercentage = overall,
+                CurrentProgressPercentage = current,
+                StatusText = status,
+                ExtraStatusText = desc,
+            };
+            _bwWorker.ReportProgress(20, state);
         }
-
+        /// <summary>
+        /// Handles archive decompression event.
+        /// </summary>
         private void OnProcessFile(object sender, ScanEventArgs args)
         {
             // check for cancellation

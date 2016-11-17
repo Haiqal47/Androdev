@@ -42,7 +42,7 @@ namespace Androdev.Presenter
 
             _installManager = new InstallManager();
             _installManager.InstallFinished += InstallManager_InstallFinished;
-            _installManager.InstallProgressChanged += InstallManager_InstallProgressChanged;
+            _installManager.ProgressChanged += InstallManager_ProgressChanged;
             _installManager.InstallStarted += InstallManager_InstallStarted;
 
             ConfigureDelegates();
@@ -57,7 +57,7 @@ namespace Androdev.Presenter
             ResetProgressBars();
         }
 
-        private void InstallManager_InstallProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void InstallManager_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             var invoker = new Action<ProgressChangedEventArgs>(args =>
             {

@@ -31,7 +31,7 @@ namespace Androdev.Presenter
         private readonly UninstallerModel _model;
         private readonly UninstallerView _view;
 
-        private readonly BackgroundWorker _bwWorker;
+        private readonly UninstallManager _manager;
 
         public UninstallerModel Model
         {
@@ -47,52 +47,31 @@ namespace Androdev.Presenter
             _view.DrivesDataSource = dataSource;
             _view.SelectedDriveIndex = InstallationHelpers.FindAndrodevInstallation(dataSource);
 
-            _bwWorker = new BackgroundWorker {WorkerReportsProgress = true};
-            _bwWorker.DoWork += BwWorker_DoWork;
-            _bwWorker.RunWorkerCompleted += BwWorker_RunWorkerCompleted;
-            _bwWorker.ProgressChanged += BwWorker_ProgressChanged;
+            _manager = new UninstallManager();
+            _manager.UninstallStarted += UninstallManager_UninstallStarted;
+            _manager.ProgressChanged += UninstallManager_ProgressChanged;
+            _manager.UninstallFinished += UninstallManager_UninstallFinished;
 
             ConfigureDelegates();
         }
-        
+
         #region BackgroundWorker Subscriber
-        private void BwWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void UninstallManager_UninstallStarted(object sender, EventArgs eventArgs)
+        {
+            _model.UninstallButtonEnabled = false;
+            _model.CboDrivesEnabled = false;
+        }
+
+        private void UninstallManager_ProgressChanged(object sender, Core.ProgressChangedEventArgs e)
+        {
+            _model.FileName = Commons.ElipsisText(e.StatusText);
+        }
+
+        private void UninstallManager_UninstallFinished(object sender, EventArgs eventArgs)
         {
             _model.UninstallButtonEnabled = true;
             _model.CboDrivesEnabled = true;
         }
-
-        private void BwWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
-        {
-            _model.FileName = Commons.ElipsisText(e.UserState.ToString());
-        }
-
-        private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            try
-            {
-                // delete old files
-                var deletePath = Path.Combine(e.Argument.ToString(), "Androdev");
-                using (var enumer = FastIo.EnumerateFiles(deletePath, SearchOption.AllDirectories).GetEnumerator())
-                {
-                    while (enumer.MoveNext())
-                    {
-                        if (enumer.Current == null) continue;
-                        File.Delete(enumer.Current.FullPath);
-                        _bwWorker.ReportProgress(10, enumer.Current.Name);
-                    }
-                }
-
-                // delete old directory
-                Directory.Delete(deletePath, true);
-                _bwWorker.ReportProgress(100, "Androdev successfully uninstalled.");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-                _bwWorker.ReportProgress(100, "Could not delete Androdev.");
-            }
-}
         #endregion
 
         #region Delegates
@@ -117,10 +96,7 @@ namespace Androdev.Presenter
                 return;
             }
 
-            if (_bwWorker.IsBusy) return;
-            Logger.Debug("User started Androdev uninstallation.");
-            _bwWorker.RunWorkerAsync(_view.SelectedDriveName);
-            _model.UninstallButtonEnabled = false;
+          _manager.BeginUninstall();
         }
         #endregion
 
@@ -132,7 +108,7 @@ namespace Androdev.Presenter
             if (_disposedValue) return;
             if (disposing)
             {
-                _bwWorker?.Dispose();
+                _manager?.Dispose();
             }
 
             _disposedValue = true;
