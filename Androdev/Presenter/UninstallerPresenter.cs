@@ -108,7 +108,7 @@ namespace Androdev.Presenter
             if (_disposedValue) return;
             if (disposing)
             {
-                _manager?.Dispose();
+                if (_manager != null) _manager.Dispose();
             }
 
             _disposedValue = true;

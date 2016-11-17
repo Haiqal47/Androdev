@@ -52,13 +52,14 @@ namespace Androdev.Core.Installer
         {
             return ProcessHelper.RunAndWait(eclipsecPath, EclipseCommandBuilder.Build_ADTInstallCommand(InstallationHelpers.AdtPath), EclipsecSuccess);
         }
-        
+
         /// <summary>
         /// Execute Eclipse post install command.
         /// </summary>
         /// <param name="androdevPath"></param>
         /// <param name="workspaceDirectory"></param>
         /// <returns></returns>
+        [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool EclipsePostInstall(string androdevPath, string workspaceDirectory)
         {
             Logger.Debug("Eclipse IDE Post-Install action...");

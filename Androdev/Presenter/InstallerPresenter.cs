@@ -28,7 +28,7 @@ namespace Androdev.Presenter
         private readonly InstallerModel _model;
         private readonly InstallerView _view;
 
-        private readonly InstallManager _installManager;
+        private readonly InstallManager _manager;
 
         public InstallerModel Model
         {
@@ -40,13 +40,13 @@ namespace Androdev.Presenter
             _view = view;
             _model = new InstallerModel();
 
-            _installManager = new InstallManager();
-            _installManager.InstallFinished += InstallManager_InstallFinished;
-            _installManager.ProgressChanged += InstallManager_ProgressChanged;
-            _installManager.InstallStarted += InstallManager_InstallStarted;
+            _manager = new InstallManager();
+            _manager.InstallFinished += InstallManager_InstallFinished;
+            _manager.ProgressChanged += InstallManager_ProgressChanged;
+            _manager.InstallStarted += InstallManager_InstallStarted;
 
             ConfigureDelegates();
-            _installManager.UseAutomatedConfig();
+            _manager.UseAutomatedConfig();
         }
 
         #region Install Manager Subscriber
@@ -126,13 +126,13 @@ namespace Androdev.Presenter
                 case 0:
                     Logger.Debug("User starts installation process.");
                     UpdateSetupButton(0, false);
-                    _installManager.BeginInstall();
+                    _manager.BeginInstall();
                     break;
 
                 case 1:
                     Logger.Debug("User stops installation process.");
                     UpdateSetupButton(1, false);
-                    _installManager.EndInstall();
+                    _manager.EndInstall();
                     break;
             }
         }
@@ -153,14 +153,14 @@ namespace Androdev.Presenter
         {
             using (var frm = new InstallConfigDialog())
             {
-                frm.InstallRoot = _installManager.InstallRoot;
-                frm.UacCompatibility = _installManager.UacCompatibility;
+                frm.InstallRoot = _manager.InstallRoot;
+                frm.UacCompatibility = _manager.UacCompatibility;
                 if (frm.ShowDialog() != DialogResult.OK) return;
 
                 try
                 {
-                    _installManager.InstallRoot = frm.InstallRoot;
-                    _installManager.UacCompatibility = frm.UacCompatibility;
+                    _manager.InstallRoot = frm.InstallRoot;
+                    _manager.UacCompatibility = frm.UacCompatibility;
                     UpdateSetupButton(0, true);
                     Logger.Debug(string.Format("Install parameter changed. Root:{0}, UAC:{1}", frm.InstallRoot, frm.UacCompatibility));
                 }
@@ -194,7 +194,7 @@ namespace Androdev.Presenter
             if (!_disposedValue) return;
             if (disposing)
             {
-                _installManager?.Dispose();
+                if (_manager != null) _manager.Dispose();
             }
 
             _disposedValue = true;
