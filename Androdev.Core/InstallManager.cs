@@ -459,18 +459,18 @@ namespace Androdev.Core
 
         private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // check for dependecies
-            if (!InstallationHelpers.CheckDependecies())
-            {
-                WorkerReportProgress(0, 0, "Dependecies missing!", "Click [Update] to download necessary items.");
-                _bwWorker.CancelAsync();
-                return;
-            }
-
             // check existing installation
             if (InstallationHelpers.IsAndrodevExist(InstallRoot))
             {
                 WorkerReportProgress(0, 0, "Existing installation detected.", "Please remove existing Androdev installation.");
+                _bwWorker.CancelAsync();
+                return;
+            }
+            
+            // check for dependecies
+            if (!InstallationHelpers.CheckDependecies())
+            {
+                WorkerReportProgress(0, 0, "Dependecies missing!", "Click [Update] to download necessary items.");
                 _bwWorker.CancelAsync();
                 return;
             }
