@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Androdev")]
-[assembly: AssemblyDescription("Enhaced Android development environment.")]
+[assembly: AssemblyDescription("Enhaced Android development environment")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("KIRSmartCyber")]
 [assembly: AssemblyProduct("Androdev")]
@@ -47,4 +47,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyFileVersion("1.6.0.0")]

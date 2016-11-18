@@ -62,7 +62,17 @@ namespace Androdev.View.Dialogs
 
             chkUAC.Checked = UacCompatibility;
             cboInstallDir.DataSource = dataSource;
-            cboInstallDir.SelectedIndex = InstallationHelpers.FindAndrodevInstallation(dataSource);
+            cboInstallDir.SelectedIndex = NameToIndex(dataSource, InstallRoot);
+        }
+
+        private int NameToIndex(DriveInfo[] arr, string name)
+        {
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i].Name == name)
+                    return i;
+            }
+            return 0;
         }
         #endregion
 
