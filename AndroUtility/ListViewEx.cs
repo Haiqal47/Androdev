@@ -41,6 +41,7 @@ namespace AndroUtility
                 base.OnNotifyMessage(m);
         }
 
+        #region Methods
         public void SafeAddItem(ListViewItem item)
         {
             if (InvokeRequired)
@@ -91,6 +92,6 @@ namespace AndroUtility
                 } //End for loop
             } //End invoke logic
         }
-
+#endregion
     }
 }
