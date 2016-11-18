@@ -27,6 +27,7 @@ namespace Androdev.Core.IO
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
 
+        #region Methods
         /// <summary>
         /// Execute specified file and wait for exit. Listen to stdout and match it with given condition.
         /// </summary>
@@ -138,6 +139,7 @@ namespace Androdev.Core.IO
                 installerProcess?.Close();
             }
         }
+        #endregion
     }
 }
 

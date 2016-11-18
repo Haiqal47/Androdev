@@ -45,6 +45,7 @@ namespace Androdev.Core.Installer
             "    </trustInfo>" +
             "</assembly>";
 
+        #region Methods
         /// <summary>
         /// Check for dependecies.
         /// </summary>
@@ -137,14 +138,13 @@ namespace Androdev.Core.Installer
             try
             {
                 using (var fs = new StreamWriter(outputFile, false))
-                {
                     fs.Write(ManifestTemplate);
-                }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
             }
         }
+#endregion
     }
 }

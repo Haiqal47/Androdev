@@ -19,6 +19,9 @@ using System.Security.Permissions;
 
 namespace Androdev.Core
 {
+    /// <summary>
+    /// Provides basic logging functionality.
+    /// </summary>
     public class LogManager
     {
         private const string LogFormatString = "{0}\t{1}\t[{2}][{3}] {4}";
@@ -27,6 +30,18 @@ namespace Androdev.Core
 
         private readonly string _logClass;
 
+        #region Constructor
+        public LogManager(string className)
+        {
+            _logClass = className;
+        }
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Gets current class logger service.
+        /// </summary>
+        /// <returns></returns>
         public static LogManager GetClassLogger()
         {
             var tempTrace = new StackFrame(1);
@@ -38,7 +53,9 @@ namespace Androdev.Core
             }
             return new LogManager("UNTRACEABLE");
         }
-
+        /// <summary>
+        /// Configure logger system.
+        /// </summary>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static void ConfigureLogger()
         {
@@ -53,12 +70,9 @@ namespace Androdev.Core
             // add trace listener
             Trace.Listeners.Add(new TextWriterTraceListener(fullPath, "MainLogger"));
         }
+        #endregion
 
-        public LogManager(string className)
-        {
-            _logClass = className;
-        }
-
+        #region Methods
         public void Error(string message)
         {
             WriteEntry(message, "[ERROR] ");
@@ -89,6 +103,11 @@ namespace Androdev.Core
             WriteEntry(message, "[DEBUG] ");
         }
 
+        /// <summary>
+        /// Writes to trace.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="level"></param>
         private void WriteEntry(string message, string level)
         {
             var frame = new StackFrame(2);
@@ -97,5 +116,6 @@ namespace Androdev.Core
 
             Trace.WriteLine(string.Format(LogFormatString, currentDate, level, _logClass, caller, message));
         }
+        #endregion
     }
 }

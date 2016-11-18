@@ -21,11 +21,15 @@ using IWshRuntimeLibrary;
 
 namespace Androdev.Core.IO
 {
+    /// <summary>
+    /// Provides fast IO actions using WinAPI.
+    /// </summary>
     [SecurityCritical]
     public static class FastIo
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
 
+        #region Methods
         /// <summary>
         /// Enumerate files inside directory.
         /// </summary>
@@ -34,15 +38,13 @@ namespace Androdev.Core.IO
         /// <returns><see cref="IEnumerable{FileData}"/> object.</returns>
         public static IEnumerable<FileData> EnumerateFiles(string path, SearchOption option)
         {
+            // check if path is null
             if (path == null)
-            {
                 throw new ArgumentNullException(nameof(path));
-            }
+            // check if option is out of range
             if ((option != SearchOption.AllDirectories) && (option != SearchOption.TopDirectoryOnly))
-            {
                 throw new ArgumentOutOfRangeException(nameof(option));
-            }
-            
+
             // queue first directory
             var winFindData = new WIN32_FIND_DATA();
             var qDirectories = new Queue<string>();
@@ -64,9 +66,7 @@ namespace Androdev.Core.IO
                     {
                         // if the file is a Directory and AllDriectiories is selected, enqueue it.
                         if ("." != winFindData.cFileName && ".." != winFindData.cFileName && option == SearchOption.AllDirectories)
-                        {
                             qDirectories.Enqueue(curPath);
-                        }
                     }
                     else
                     {
@@ -113,7 +113,7 @@ namespace Androdev.Core.IO
             {
                 var shortcutLocation = Path.Combine(Commons.GetDesktopPath(), properties.Name + ".lnk");
                 var shell = new WshShell();
-                var shortcut = (IWshShortcut) shell.CreateShortcut(shortcutLocation);
+                var shortcut = (IWshShortcut)shell.CreateShortcut(shortcutLocation);
 
                 if (properties.IconFile != null) shortcut.IconLocation = properties.IconFile;
                 shortcut.Description = properties.Comment;
@@ -126,5 +126,6 @@ namespace Androdev.Core.IO
                 Logger.Error(ex);
             }
         }
+        #endregion
     }
 }

@@ -23,7 +23,8 @@ namespace Androdev.Core
     public static class Commons
     {
         public const int Wait15MinMilis = 900000;
-        
+
+        #region Methods
         /// <summary>
         /// Gets current desktop path.
         /// </summary>
@@ -118,6 +119,6 @@ namespace Androdev.Core
             sb.Append(relativePath.Replace("\\", "\\\\"));
             return sb.ToString();
         }
-        
+        #endregion
     }
 }

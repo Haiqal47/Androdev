@@ -29,6 +29,7 @@ namespace Androdev.Core.Installer
         private const string EclipsecSuccess = "Operation completed";
         private const string JdkInstallArguments = "/s ADDLOCAL=\"ToolsFeature,SourceFeature,PublicjreFeature\"";
 
+        #region Methods
         /// <summary>
         /// Installs Java Development Kit.
         /// </summary>
@@ -86,5 +87,6 @@ namespace Androdev.Core.Installer
             Logger.Debug("Workspace directory created and has been set to Eclipse configuration.");
             return true;
         }
+        #endregion
     }
 }
