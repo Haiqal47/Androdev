@@ -12,11 +12,10 @@
 // 
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
-using System;
 
-namespace Androdev.Core
+namespace Androdev.Core.Args
 {
-    public class ProgressChangedEventArgs : EventArgs
+    public class InstallProgressChangedEventArgs : System.EventArgs
     {
         public int OverallProgressPercentage { get; set; }
         public int CurrentProgressPercentage { get; set; }
