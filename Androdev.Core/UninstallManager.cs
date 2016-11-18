@@ -111,7 +111,7 @@ namespace Androdev.Core
             UninstallFinished?.Invoke(this, EventArgs.Empty);
         }
 
-        private void BwWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        private void BwWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             ProgressChanged?.Invoke(this, (InstallProgressChangedEventArgs) e.UserState);
         }

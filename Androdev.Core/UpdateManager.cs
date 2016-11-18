@@ -17,13 +17,14 @@ using System.ComponentModel;
 using System.IO;
 using System.Net;
 using Androdev.Core.Args;
+using Androdev.Core.IO;
 
 namespace Androdev.Core
 {
     /// <summary>
-    /// 
+    /// Provides update interface.
     /// </summary>
-    public class UpdateManager : IDisposable
+    public sealed class UpdateManager : IDisposable
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
         private static readonly PathService Paths = PathService.Instance();
@@ -93,55 +94,39 @@ namespace Androdev.Core
         }
         #endregion
 
-        #region BackgroundWorker
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            UpdateFinished?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            if (e.ProgressPercentage == 1)
-            {
-                ProgressChanged?.Invoke(this, (UpdateProgressChangedEventArgs)e.UserState);
-            }
-            else
-            {
-                DownloadStarted?.Invoke(this, (DownloadStartedEventArgs)e.UserState);
-            }
-        }
-
-        private void Worker_DoWork(object sender, DoWorkEventArgs doWorkEventArgs)
-        {
-            // remove old bin folder
-            Update_DeleteOld();
-            if (_bwDownloader.CancellationPending) return;
-
-            // create new bin folder
-            Directory.CreateDirectory(Paths.BinariesPath);
-
-            // download each files
-            for (int i = 0; i < 5; i++)
-            {
-                if (_bwDownloader.CancellationPending) return; // cancellation boundary
-
-                // download the file
-                Update_DownloadThis(i);
-            }
-        }
-        #endregion
-        
         #region Core Update Methods
-
         private void Update_DeleteOld()
         {
+            // remove files
+            Logger.Debug("Attempt to remove Androdev binary files.");
+            using (var enumer = FastIo.EnumerateFiles(Paths.InstallPath, SearchOption.AllDirectories).GetEnumerator())
+            {
+                while (enumer.MoveNext())
+                {
+                    // checks if current is null
+                    if (enumer.Current == null) continue;
+                    try
+                    {
+                        // try to delete
+                        File.Delete(enumer.Current.FullPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Can't delete dependecy.", ex);
+                    }
+                } // end while
+            } // end using
+
+            // remove folder
+            Logger.Debug("Attempt to remove Androdev binaries directory.");
             try
             {
                 Directory.Delete(Paths.BinariesPath, true);
+                Logger.Debug("Removed Androdev binaries directory.");
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.Error("Can't delete Androdev binaries directory.", ex);
             }
         }
 
@@ -153,10 +138,10 @@ namespace Androdev.Core
             var downloadUri = new Uri(PathService.GetUrlByIndex(index));
 
             // request file
-            fileRequest = (HttpWebRequest) WebRequest.Create(downloadUri);
+            fileRequest = (HttpWebRequest)WebRequest.Create(downloadUri);
             try
             {
-                fileResponse = (HttpWebResponse) fileRequest.GetResponse();
+                fileResponse = (HttpWebResponse)fileRequest.GetResponse();
             }
             catch (Exception ex)
             {
@@ -166,13 +151,13 @@ namespace Androdev.Core
             // check for null
             if (fileResponse == null)
             {
-                
+
                 _bwDownloader.CancelAsync();
                 return;
             }
 
             // cancellation boundary
-            if (_bwDownloader.CancellationPending) return; 
+            if (_bwDownloader.CancellationPending) return;
 
             // prepare variables
             var fileSize = fileResponse.ContentLength;
@@ -202,12 +187,12 @@ namespace Androdev.Core
 
                     // read data from server
                     bytesRead = remoteStream.Read(buffer, 0, buffer.Length);
-                    
+
                     // write buffer
                     fs.Write(buffer, 0, bytesRead);
 
                     // calculate and report
-                    var progressPercentage = (double) bytesProcessed/fileSize*100;
+                    var progressPercentage = (double)bytesProcessed / fileSize * 100;
                     UpdateProgress(bytesProcessed, Convert.ToInt32(progressPercentage));
 
                     // do while there is a data
@@ -215,13 +200,51 @@ namespace Androdev.Core
                 } while (bytesRead != 0);
             }
         }
-
         #endregion  
+
+        #region BackgroundWorker
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            UpdateFinished?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (e.ProgressPercentage == 1)
+            {
+                ProgressChanged?.Invoke(this, (UpdateProgressChangedEventArgs)e.UserState);
+            }
+            else
+            {
+                DownloadStarted?.Invoke(this, (DownloadStartedEventArgs)e.UserState);
+            }
+        }
+
+        private void Worker_DoWork(object sender, DoWorkEventArgs doWorkEventArgs)
+        {
+            // remove old bin folder
+            Update_DeleteOld();
+            if (_bwDownloader.CancellationPending) return;
+
+            // create new bin folder
+            Logger.Debug("Fresh binaries directory created.");
+            Directory.CreateDirectory(Paths.BinariesPath);
+
+            // download each files
+            for (int i = 0; i < 5; i++)
+            {
+                if (_bwDownloader.CancellationPending) return; // cancellation boundary
+
+                // download the file
+                Update_DownloadThis(i);
+            }
+        }
+        #endregion
 
         #region IDisposable Support
         private bool _disposedValue;
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (_disposedValue) return;
             if (disposing)
