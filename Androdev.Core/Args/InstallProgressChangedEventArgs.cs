@@ -12,7 +12,6 @@
 // 
 //     You should have received a copy of the GNU General Public License
 //     along with Androdev.  If not, see <http://www.gnu.org/licenses/>.
-
 namespace Androdev.Core.Args
 {
     public class InstallProgressChangedEventArgs : System.EventArgs
