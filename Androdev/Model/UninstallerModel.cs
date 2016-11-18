@@ -24,12 +24,14 @@ namespace Androdev.Model
         private bool _uninstallButtonEnabled;
         private bool _cboDrivesEnabled;
         private string _filename;
+        private string _status;
 
         public UninstallerModel()
         {
             _uninstallButtonEnabled = true;
             _cboDrivesEnabled = true;
             _filename = "...";
+            _status = "...";
         }
 
         public bool UninstallButtonEnabled
@@ -54,13 +56,23 @@ namespace Androdev.Model
 
         public string FileName
         {
-            get { return Commons.ElipsisText(_filename); }
+            get { return _filename; }
             set
             {
                 _filename = value;
                 OnPropertyChanged(nameof(FileName));
             }
         }
-        
+
+        public string Status
+        {
+            get { return _status; }
+            set
+            {
+                _filename = value;
+                OnPropertyChanged(nameof(Status));
+            }
+        }
+
     }
 }

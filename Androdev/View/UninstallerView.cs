@@ -59,6 +59,7 @@ namespace Androdev.View
             cmdInstallationCleaner.DataBindings.Add("Enabled", _presenter.Model, "UninstallButtonEnabled");
             lblProcessedFile.DataBindings.Add("Text", _presenter.Model, "FileName");
             cboDrive.DataBindings.Add("Enabled", _presenter.Model, "CboDrivesEnabled");
+            lblStatus.DataBindings.Add("Text", _presenter.Model, "Status");
         }
         
         protected override void Dispose(bool disposing)

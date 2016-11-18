@@ -56,16 +56,17 @@ namespace Androdev.Presenter
             ConfigureDelegates();
         }
 
-        #region BackgroundWorker Subscriber
+        #region Uninstall Manager Subscriber
         private void UninstallManager_UninstallStarted(object sender, EventArgs eventArgs)
         {
             _model.UninstallButtonEnabled = false;
             _model.CboDrivesEnabled = false;
         }
 
-        private void UninstallManager_ProgressChanged(object sender, InstallProgressChangedEventArgs e)
+        private void UninstallManager_ProgressChanged(object sender, UninstallProgressChangedEventArgs e)
         {
-            _model.FileName = Commons.ElipsisText(e.StatusText);
+            _model.FileName = Commons.ElipsisText(e.CurrentFile);
+            _model.Status = e.StatusText;
         }
 
         private void UninstallManager_UninstallFinished(object sender, EventArgs eventArgs)

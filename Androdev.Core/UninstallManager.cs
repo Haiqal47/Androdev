@@ -61,13 +61,15 @@ namespace Androdev.Core
             _bwWorker.DoWork += BwWorker_DoWork;
             _bwWorker.RunWorkerCompleted += BwWorker_RunWorkerCompleted;
             _bwWorker.ProgressChanged += BwWorker_ProgressChanged;
+
+            InstallRoot = InstallationHelpers.FindAndrodevInstallation();
         }
 
         #endregion
 
         #region Events
         public event EventHandler UninstallStarted;
-        public event EventHandler<InstallProgressChangedEventArgs> ProgressChanged;
+        public event EventHandler<UninstallProgressChangedEventArgs> ProgressChanged;
         public event EventHandler UninstallFinished;
         #endregion
 
@@ -96,12 +98,13 @@ namespace Androdev.Core
         /// <summary>
         /// Report progress to view.
         /// </summary>
-        private void WorkerReportProgress(string status)
+        private void WorkerReportProgress(string status, string filename = "TEST")
         {
-            var state = new UninstallProgressChangedEventArgs()
-            {
-                CurrentFile = status,
-            };
+            var state = new UninstallProgressChangedEventArgs();
+            state.CurrentFile = status;
+            if (filename != "TEST")
+                state.StatusText = filename;
+
             _bwWorker.ReportProgress(20, state);
         }
         #endregion
@@ -114,20 +117,21 @@ namespace Androdev.Core
 
         private void BwWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            ProgressChanged?.Invoke(this, (InstallProgressChangedEventArgs) e.UserState);
+            ProgressChanged?.Invoke(this, (UninstallProgressChangedEventArgs) e.UserState);
         }
 
         private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             // check existing installation
-            if (InstallationHelpers.IsAndrodevExist(InstallRoot))
+            if (!InstallationHelpers.IsAndrodevExist(InstallRoot))
             {
-                WorkerReportProgress("Existing installation detected.");
+                WorkerReportProgress(string.Empty, "Unable to locate existing installation detected.");
                 _bwWorker.CancelAsync();
                 return;
             }
 
             // delete all files
+            WorkerReportProgress(string.Empty, "Removing files...");
             using (var enumer = FastIo.EnumerateFiles(_paths.InstallPath, SearchOption.AllDirectories).GetEnumerator())
             {
                 var errorAttempt = 0;
@@ -139,7 +143,7 @@ namespace Androdev.Core
                     // checks for deleteion attempt
                     if (errorAttempt >= 10)
                     {
-                        WorkerReportProgress("Cannot remove Androdev. See log file.");
+                        WorkerReportProgress(string.Empty, "Cannot remove Androdev. See log file.");
                         return;
                     }
                     
@@ -153,7 +157,7 @@ namespace Androdev.Core
                     {
                         // unable to delete
                         errorAttempt++;
-                        WorkerReportProgress(enumer.Current.Name + ": delete file failed.");
+                        WorkerReportProgress(string.Empty, enumer.Current.Name + ": delete file failed.");
                         Logger.Error(ex);
                     }
                 } // end while
@@ -166,12 +170,12 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-                WorkerReportProgress("Delete folder failed.");
+                WorkerReportProgress(string.Empty, "Delete folder failed.");
                 Logger.Error(ex);
             }
 
             // all finish
-            WorkerReportProgress("Androdev has been uninstalled.");
+            WorkerReportProgress(string.Empty, "Androdev has been uninstalled.");
             Logger.Info("Androdev has been uninstalled.");
         }
         #endregion

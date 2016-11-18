@@ -23,6 +23,7 @@
             this.lblProcessedFile = new System.Windows.Forms.Label();
             this.cmdInstallationCleaner = new System.Windows.Forms.Button();
             this.imgList = new System.Windows.Forms.ImageList(this.components);
+            this.lblStatus = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -67,7 +68,7 @@
             this.cmdInstallationCleaner.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cmdInstallationCleaner.ImageIndex = 0;
             this.cmdInstallationCleaner.ImageList = this.imgList;
-            this.cmdInstallationCleaner.Location = new System.Drawing.Point(96, 89);
+            this.cmdInstallationCleaner.Location = new System.Drawing.Point(96, 119);
             this.cmdInstallationCleaner.Name = "cmdInstallationCleaner";
             this.cmdInstallationCleaner.Size = new System.Drawing.Size(122, 27);
             this.cmdInstallationCleaner.TabIndex = 19;
@@ -82,11 +83,20 @@
             this.imgList.TransparentColor = System.Drawing.Color.Transparent;
             this.imgList.Images.SetKeyName(0, "full_trash-48.png");
             // 
+            // lblStatus
+            // 
+            this.lblStatus.Location = new System.Drawing.Point(13, 82);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(282, 31);
+            this.lblStatus.TabIndex = 20;
+            this.lblStatus.Text = "...";
+            // 
             // UninstallerView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(307, 128);
+            this.ClientSize = new System.Drawing.Size(307, 158);
+            this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.cmdInstallationCleaner);
             this.Controls.Add(this.lblProcessedFile);
             this.Controls.Add(this.label2);
@@ -112,5 +122,6 @@
         private System.Windows.Forms.Label lblProcessedFile;
         private System.Windows.Forms.Button cmdInstallationCleaner;
         private System.Windows.Forms.ImageList imgList;
+        private System.Windows.Forms.Label lblStatus;
     }
 }
