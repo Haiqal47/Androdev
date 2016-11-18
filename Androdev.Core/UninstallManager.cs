@@ -15,6 +15,7 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using Androdev.Core.Args;
 using Androdev.Core.Installer;
 using Androdev.Core.IO;
 
@@ -26,7 +27,7 @@ namespace Androdev.Core
     public sealed class UninstallManager : IDisposable
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        private static readonly PathService Paths = PathService.Instance;
+        private static readonly PathService Paths = PathService.Instance();
         private readonly BackgroundWorker _bwWorker;
 
         #region Properties
@@ -65,7 +66,7 @@ namespace Androdev.Core
 
         #region Events
         public event EventHandler UninstallStarted;
-        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+        public event EventHandler<InstallProgressChangedEventArgs> ProgressChanged;
         public event EventHandler UninstallFinished;
         #endregion
 
@@ -94,12 +95,11 @@ namespace Androdev.Core
         /// <summary>
         /// Report progress to view.
         /// </summary>
-        private void WorkerReportProgress(int overall, string status)
+        private void WorkerReportProgress(string status)
         {
-            var state = new ProgressChangedEventArgs()
+            var state = new UninstallProgressChangedEventArgs()
             {
-                OverallProgressPercentage = overall,
-                StatusText = status,
+                CurrentFile = status,
             };
             _bwWorker.ReportProgress(20, state);
         }
@@ -113,7 +113,7 @@ namespace Androdev.Core
 
         private void BwWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
-            ProgressChanged?.Invoke(this, (ProgressChangedEventArgs) e.UserState);
+            ProgressChanged?.Invoke(this, (InstallProgressChangedEventArgs) e.UserState);
         }
 
         private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -121,7 +121,7 @@ namespace Androdev.Core
             // check existing installation
             if (InstallationHelpers.IsAndrodevExist(InstallRoot))
             {
-                WorkerReportProgress(0,"Existing installation detected.");
+                WorkerReportProgress("Existing installation detected.");
                 _bwWorker.CancelAsync();
                 return;
             }
@@ -138,7 +138,7 @@ namespace Androdev.Core
                     // checks for deleteion attempt
                     if (errorAttempt >= 10)
                     {
-                        WorkerReportProgress(0, "Cannot remove Androdev. See log file.");
+                        WorkerReportProgress("Cannot remove Androdev. See log file.");
                         return;
                     }
                     
@@ -146,13 +146,13 @@ namespace Androdev.Core
                     {
                         // try to delete
                         File.Delete(enumer.Current.FullPath);
-                        WorkerReportProgress(10, enumer.Current.Name);
+                        WorkerReportProgress(enumer.Current.Name);
                     }
                     catch (Exception ex)
                     {
                         // unable to delete
                         errorAttempt++;
-                        WorkerReportProgress(0,enumer.Current.Name + ": delete file failed.");
+                        WorkerReportProgress(enumer.Current.Name + ": delete file failed.");
                         Logger.Error(ex);
                     }
                 } // end while
@@ -165,12 +165,12 @@ namespace Androdev.Core
             }
             catch (Exception ex)
             {
-                WorkerReportProgress(0, "Delete folder failed.");
+                WorkerReportProgress("Delete folder failed.");
                 Logger.Error(ex);
             }
 
             // all finish
-            WorkerReportProgress(0, "Androdev has been uninstalled.");
+            WorkerReportProgress("Androdev has been uninstalled.");
             Logger.Info("Androdev has been uninstalled.");
         }
         #endregion

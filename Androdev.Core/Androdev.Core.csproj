@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons.cs" />
+    <Compile Include="Args\DownloadStartedEventArgs.cs" />
     <Compile Include="Installer\EclipseCommandBuilder.cs" />
     <Compile Include="Installer\InstallationHelpers.cs" />
     <Compile Include="Installer\PackageInstaller.cs" />
@@ -48,7 +49,7 @@
     <Compile Include="Installer\EclipseConfigurator.cs" />
     <Compile Include="InstallManager.cs" />
     <Compile Include="PathService.cs" />
-    <Compile Include="ProgressChangedEventArgs.cs" />
+    <Compile Include="Args\InstallProgressChangedEventArgs.cs" />
     <Compile Include="IO\FastIo.cs" />
     <Compile Include="IO\FileData.cs" />
     <Compile Include="IO\ShortcutProperties.cs" />
@@ -58,6 +59,9 @@
     <Compile Include="Native\WIN32_FIND_DATA.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UninstallManager.cs" />
+    <Compile Include="Args\UninstallProgressChangedEventArgs.cs" />
+    <Compile Include="UpdateManager.cs" />
+    <Compile Include="Args\UpdateProgressChangedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="IWshRuntimeLibrary">

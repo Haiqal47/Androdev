@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using Androdev.Core;
+using Androdev.Core.Args;
 using Androdev.Core.Installer;
 using Androdev.Core.IO;
 using Androdev.Model;
@@ -62,7 +63,7 @@ namespace Androdev.Presenter
             _model.CboDrivesEnabled = false;
         }
 
-        private void UninstallManager_ProgressChanged(object sender, Core.ProgressChangedEventArgs e)
+        private void UninstallManager_ProgressChanged(object sender, InstallProgressChangedEventArgs e)
         {
             _model.FileName = Commons.ElipsisText(e.StatusText);
         }
@@ -117,7 +118,6 @@ namespace Androdev.Presenter
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
         #endregion
     }

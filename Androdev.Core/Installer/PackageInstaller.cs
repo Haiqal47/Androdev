@@ -24,7 +24,7 @@ namespace Androdev.Core.Installer
     public static class PackageInstaller
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        private static readonly PathService Paths = PathService.Instance;
+        private static readonly PathService Paths = PathService.Instance();
 
         private const string EclipsecSuccess = "Operation completed";
         private const string JdkInstallArguments = "/s ADDLOCAL=\"ToolsFeature,SourceFeature,PublicjreFeature\"";

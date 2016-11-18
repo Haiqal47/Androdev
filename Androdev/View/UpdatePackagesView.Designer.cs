@@ -149,7 +149,6 @@
             this.Name = "UpdatePackagesView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Update Components";
-            this.Load += new System.EventHandler(this.FrmUpdate_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

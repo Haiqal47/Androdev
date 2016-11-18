@@ -26,7 +26,7 @@ namespace Androdev.Core.Installer
         private const string JavaRegistryPath2 = "SOFTWARE\\Wow6432Node\\JavaSoft\\Java Development Kit\\1.8.0_101";
 
         public static readonly string JdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\jdk-8u101-windows-i586.exe");
-        public static readonly string AndroidSdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\android-sdk.zip");
+        public static readonly string AndroidSdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\android-sdk_r24.1.2-windows.zip");
         public static readonly string EclipseIdePath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\eclipse-java-mars-2-win32.zip");
         public static readonly string AdtPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\ADT-23.0.7.zip");
 

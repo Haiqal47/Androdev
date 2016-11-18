@@ -32,16 +32,19 @@ namespace Androdev.Core
 
         private string _installRoot;
         private static PathService _instance;
+        private static readonly object _lockPad = new object();
 
         #region Static Instance
         /// <summary>
         /// Gets latest instance of this class.
         /// </summary>
-        public static PathService Instance
+        public static PathService Instance()
         {
-            get { return _instance; }
+             lock (_lockPad)
+            {
+                return _instance;
+            }
         }
-
         /// <summary>
         /// Initialize new instance of <see cref="PathService"/> class. 
         /// </summary>
@@ -73,6 +76,13 @@ namespace Androdev.Core
         public string InstallPath
         {
             get { return Path.Combine(_installRoot, "Androdev"); }
+        }
+        /// <summary>
+        /// Androdev binary dependecies directory ([InstallRoot]\Androdev);
+        /// </summary>
+        public string BinariesPath
+        {
+            get { return Path.Combine(Commons.GetBaseDirectoryPath(), "bin"); }
         }
         /// <summary>
         /// Fullpath to Eclipse installation directory.

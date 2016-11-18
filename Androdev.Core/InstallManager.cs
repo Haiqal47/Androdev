@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
+using Androdev.Core.Args;
 using Androdev.Core.Installer;
 using Androdev.Core.IO;
 using ICSharpCode.SharpZipLib.Core;
@@ -36,7 +37,7 @@ namespace Androdev.Core
         }
 
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        private static readonly PathService Paths = PathService.Instance;
+        private static readonly PathService Paths = PathService.Instance();
         private readonly BackgroundWorker _bwWorker;
         private ExtractProcessInfo _extractInfo;
 
@@ -65,7 +66,7 @@ namespace Androdev.Core
         /// </summary>
         public string InstallRoot
         {
-            get { return PathService.Instance.InstallRoot; }
+            get { return PathService.Instance().InstallRoot; }
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -91,72 +92,8 @@ namespace Androdev.Core
         
         #region Events
         public event EventHandler InstallStarted;
-        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
+        public event EventHandler<InstallProgressChangedEventArgs> ProgressChanged;
         public event EventHandler InstallFinished;
-        #endregion
-
-        #region Thread Worker Subscriber
-        private void BwWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            InstallFinished?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void BwWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
-        {
-            ProgressChanged?.Invoke(this, (ProgressChangedEventArgs)e.UserState);
-        }
-
-        private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            // check for dependecies
-            if (!InstallationHelpers.CheckDependecies())
-            {
-                WorkerReportProgress(0, 0, "Dependecies missing!", "Click [Update] to download necessary items.");
-                _bwWorker.CancelAsync();
-                return;
-            }
-
-            // check existing installation
-            if (InstallationHelpers.IsAndrodevExist(InstallRoot))
-            {
-                WorkerReportProgress(0, 0, "Existing installation detected.", "Please remove existing Androdev installation.");
-                _bwWorker.CancelAsync();
-                return;
-            }
-
-            // step 1 - install JDK
-            Install_JavaDevelopmentKit();
-            if (_bwWorker.CancellationPending) return; // cancellation boundary
-
-            // step 2 - config PATH
-            Install_PathEnvironmentVars();
-            if (_bwWorker.CancellationPending) return; // cancellation boundary
-
-            // step 3 - install Android SDK
-            Install_AndroidSdk();
-            if (_bwWorker.CancellationPending) return; // cancellation boundary
-
-            // step 4 - install Eclipse IDE
-            Install_EclipseMarsTwo();
-            if (_bwWorker.CancellationPending) return; // cancellation boundary
-
-            // add manifest if necessary
-            if (UacCompatibility) Install_Manifests();
-            if (_bwWorker.CancellationPending) return; // cancellation boundary
-
-            // step 5 - install ADT
-            Install_ADT();
-
-            // step 6 - configure Eclipse
-            Install_ConfigureEclipse();
-
-            // step 7 - create shortcuts
-            Install_Shortcuts();
-
-            // all finish
-            WorkerReportProgress(0, 0, "Androdev has been installed successfully.");
-            Logger.Info("Androdev has been installed successfully.");
-        }
         #endregion
 
         #region Methods
@@ -212,7 +149,7 @@ namespace Androdev.Core
         /// </summary>
         private void WorkerReportProgress(int overall, int current, string status, string desc = "")
         {
-            var state = new ProgressChangedEventArgs()
+            var state = new InstallProgressChangedEventArgs()
             {
                 OverallProgressPercentage = overall,
                 CurrentProgressPercentage = current,
@@ -509,6 +446,70 @@ namespace Androdev.Core
         }
         #endregion
 
+        #region Thread Worker Subscriber
+        private void BwWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            InstallFinished?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void BwWorker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        {
+            ProgressChanged?.Invoke(this, (InstallProgressChangedEventArgs)e.UserState);
+        }
+
+        private void BwWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // check for dependecies
+            if (!InstallationHelpers.CheckDependecies())
+            {
+                WorkerReportProgress(0, 0, "Dependecies missing!", "Click [Update] to download necessary items.");
+                _bwWorker.CancelAsync();
+                return;
+            }
+
+            // check existing installation
+            if (InstallationHelpers.IsAndrodevExist(InstallRoot))
+            {
+                WorkerReportProgress(0, 0, "Existing installation detected.", "Please remove existing Androdev installation.");
+                _bwWorker.CancelAsync();
+                return;
+            }
+
+            // step 1 - install JDK
+            Install_JavaDevelopmentKit();
+            if (_bwWorker.CancellationPending) return; // cancellation boundary
+
+            // step 2 - config PATH
+            Install_PathEnvironmentVars();
+            if (_bwWorker.CancellationPending) return; // cancellation boundary
+
+            // step 3 - install Android SDK
+            Install_AndroidSdk();
+            if (_bwWorker.CancellationPending) return; // cancellation boundary
+
+            // step 4 - install Eclipse IDE
+            Install_EclipseMarsTwo();
+            if (_bwWorker.CancellationPending) return; // cancellation boundary
+
+            // add manifest if necessary
+            if (UacCompatibility) Install_Manifests();
+            if (_bwWorker.CancellationPending) return; // cancellation boundary
+
+            // step 5 - install ADT
+            Install_ADT();
+
+            // step 6 - configure Eclipse
+            Install_ConfigureEclipse();
+
+            // step 7 - create shortcuts
+            Install_Shortcuts();
+
+            // all finish
+            WorkerReportProgress(0, 0, "Androdev has been installed successfully.");
+            Logger.Info("Androdev has been installed successfully.");
+        }
+        #endregion
+
         #region IDisposable Support
         private bool _disposedValue; // To detect redundant calls
 
@@ -526,7 +527,6 @@ namespace Androdev.Core
         public void Dispose()
         {
             Dispose(true);
-            //GC.SuppressFinalize(this);
         }
         #endregion
     }

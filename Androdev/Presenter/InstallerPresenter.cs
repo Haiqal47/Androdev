@@ -19,6 +19,7 @@ using Androdev.View;
 using Androdev.View.Dialogs;
 using System;
 using System.Windows.Forms;
+using Androdev.Core.Args;
 
 namespace Androdev.Presenter
 {
@@ -57,9 +58,9 @@ namespace Androdev.Presenter
             ResetProgressBars();
         }
 
-        private void InstallManager_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void InstallManager_ProgressChanged(object sender, InstallProgressChangedEventArgs e)
         {
-            var invoker = new Action<ProgressChangedEventArgs>(args =>
+            var invoker = new Action<InstallProgressChangedEventArgs>(args =>
             {
                 _model.ProgressStyle = (args.CurrentProgressPercentage == 99 ? ProgressBarStyle.Marquee : ProgressBarStyle.Blocks);
                 _model.CurrentProgressPercentage = args.CurrentProgressPercentage;
@@ -203,7 +204,6 @@ namespace Androdev.Presenter
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
         #endregion
     }

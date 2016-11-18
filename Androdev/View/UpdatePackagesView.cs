@@ -35,15 +35,20 @@ namespace Androdev.View
             ConfigureWiring();
         }
 
+        #region Form Events
+        #endregion
+
         #region Methods
         private void ConfigureWiring()
         {
+            Load += _presenter.FormLoadEventHandler;
             cmdCancel.Click += _presenter.CancelButtonClickEventHandler;
 
             lblDownloaded.DataBindings.Add("Text", _presenter.Model, "DownloadedText");
             lblDownloadFileName.DataBindings.Add("Text", _presenter.Model, "DownloadFileNameText");
             lblDownloadSize.DataBindings.Add("Text", _presenter.Model, "DownloadSizeText");
             lblQueue.DataBindings.Add("Text", _presenter.Model, "QueueText");
+            prgProgress.DataBindings.Add("Value", _presenter.Model, "ProgressPercentage");
         }
 
         protected override void Dispose(bool disposing)
@@ -54,13 +59,6 @@ namespace Androdev.View
                 if (_presenter != null) _presenter.Dispose();
             }
             base.Dispose(disposing);
-        }
-        #endregion
-
-        #region Form Events
-        private void FrmUpdate_Load(object sender, EventArgs e)
-        {
-            _presenter.StartUpdate();
         }
         #endregion
     }

@@ -30,7 +30,7 @@ namespace Androdev.Core.Installer
         private const string CodeAssistConfigPath = ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings";
 
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        private static readonly PathService Paths = PathService.Instance;
+        private static readonly PathService Paths = PathService.Instance();
 
         #region Methods
         /// <summary>
