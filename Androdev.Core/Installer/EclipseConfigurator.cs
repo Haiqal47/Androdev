@@ -22,42 +22,15 @@ namespace Androdev.Core.Installer
     /// <summary>
     /// Provides Eclipse Configurator functionality.
     /// </summary>
+    [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
     public class EclipseConfigurator
     {
+        private const string EclipseConfigPath = "configuration\\.settings";
+        private const string SdkConfigPath = ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings";
+        private const string CodeAssistConfigPath = ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings";
+
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-
-        private readonly string _installDirectory;
-
-        #region Constructor
-        internal EclipseConfigurator(string androdevPath)
-        {
-            _installDirectory = androdevPath;
-        }
-        #endregion
-
-        #region Protected Properties
-        /// <summary>
-        /// Fullpath to Eclipse installation directory.
-        /// </summary>
-        private string EclipsePath
-        {
-            get { return Path.Combine(_installDirectory, "eclipse"); }
-        }
-        /// <summary>
-        /// Fullpath to eclipse.exe file.
-        /// </summary>
-        private string EclipsecFilePath
-        {
-            get { return Path.Combine(_installDirectory, "eclipse\\eclipsec.exe"); }
-        }
-        /// <summary>
-        /// Fullpath to Eclipse Workspace directory.
-        /// </summary>
-        private string EclipseWorkspacePath
-        {
-            get { return Path.Combine(_installDirectory, "workspace"); }
-        }
-        #endregion
+        private static readonly PathService Paths = PathService.Instance;
 
         #region Methods
         /// <summary>
@@ -67,7 +40,7 @@ namespace Androdev.Core.Installer
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public bool InitializeEclipseConfiguration()
         {
-            return ProcessHelper.RunAndWait(EclipsecFilePath, EclipseCommandBuilder.Build_PrepareConfigArgument());
+            return ProcessHelper.RunWait(Paths.EclipsecFilePath, EclipseCommandBuilder.Build_PrepareConfigArgument());
         }
         /// <summary>
         /// Configures Eclipse worksapce path.
@@ -77,14 +50,16 @@ namespace Androdev.Core.Installer
         {
             try
             {
-                var eclipseConfigPath = Path.Combine(EclipsePath, "configuration\\.settings");
-                Directory.CreateDirectory(eclipseConfigPath);
-                File.WriteAllText(eclipseConfigPath + "\\org.eclipse.ui.ide.prefs", EclipseCommandBuilder.Build_WorkspaceConfig(EclipseWorkspacePath));
+                var configPath = Path.Combine(Paths.EclipsePath, EclipseConfigPath);
+                var configFile = configPath + "\\org.eclipse.ui.ide.prefs";
+
+                Directory.CreateDirectory(configPath);
+                File.WriteAllText(configFile, EclipseCommandBuilder.Build_WorkspaceConfig(Paths.EclipseWorkspacePath));
                 return true;
             }
             catch (Exception ex)
             {
-               Logger.Error(ex);
+                Logger.Error(ex);
                 return false;
             }
         }
@@ -97,9 +72,11 @@ namespace Androdev.Core.Installer
         {
             try
             {
-                var eclipseConfigPath = Path.Combine(EclipseWorkspacePath, ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings");
-                Directory.CreateDirectory(eclipseConfigPath);
-                File.WriteAllText(eclipseConfigPath + "\\com.android.ide.eclipse.adt.prefs",EclipseCommandBuilder.Build_AndroidSDKConfig(androidSdkPath));
+                var configPath = Path.Combine(Paths.EclipseWorkspacePath, SdkConfigPath);
+                var configFile = configPath + "\\com.android.ide.eclipse.adt.prefs";
+
+                Directory.CreateDirectory(configPath);
+                File.WriteAllText(configFile,EclipseCommandBuilder.Build_AndroidSDKConfig(androidSdkPath));
                 return true;
             }
             catch (Exception ex)
@@ -116,9 +93,11 @@ namespace Androdev.Core.Installer
         {
             try
             {
-                var eclipseConfigPath = Path.Combine(EclipseWorkspacePath, ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings");
-                Directory.CreateDirectory(eclipseConfigPath);
-                File.WriteAllText(eclipseConfigPath + "\\org.eclipse.jdt.ui.prefs",EclipseCommandBuilder.Build_CodeAssistConfig());
+                var configPath = Path.Combine(Paths.EclipseWorkspacePath, CodeAssistConfigPath);
+                var configFile = configPath + "\\org.eclipse.jdt.ui.prefs";
+
+                Directory.CreateDirectory(configPath);
+                File.WriteAllText(configFile, EclipseCommandBuilder.Build_CodeAssistConfig());
                 return true;
             }
             catch (Exception ex)

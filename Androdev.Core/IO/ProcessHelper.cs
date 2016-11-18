@@ -35,7 +35,7 @@ namespace Androdev.Core.IO
         /// <param name="ouputTextShouldTrue">Text to compare at end of execution.</param>
         /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
-        public static bool RunAndWait(string filePath, string cmdLine, string ouputTextShouldTrue)
+        public static bool RunWait(string filePath, string cmdLine, string ouputTextShouldTrue)
         {
             Process installerProcess = null;
             AutoResetEvent outputWaitHandle = null;
@@ -103,7 +103,7 @@ namespace Androdev.Core.IO
         /// <param name="cmdLine">Additional command-line parameter.</param>
         /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
-        public static bool RunAndWait(string filePath, string cmdLine)
+        public static bool RunWait(string filePath, string cmdLine)
         {
             Process installerProcess = null;
             try

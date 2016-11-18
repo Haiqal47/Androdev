@@ -28,8 +28,6 @@ namespace Androdev.Core
     /// </summary>
     public sealed class InstallManager : IDisposable
     {
-        private static readonly LogManager Logger = LogManager.GetClassLogger();
-
         private struct ExtractProcessInfo
         {
             public string StatusText { get; set; } 
@@ -37,11 +35,14 @@ namespace Androdev.Core
             public double TotalFiles { get; set; }
         }
 
-        private ExtractProcessInfo _extractInfo;
-        private int _extractedFile;
+        private static readonly LogManager Logger = LogManager.GetClassLogger();
+        private static readonly PathService Paths = PathService.Instance;
         private readonly BackgroundWorker _bwWorker;
-        private string _installRoot;
+        private ExtractProcessInfo _extractInfo;
+
+        private int _extractedFile;
         private bool _uacCompatibility;
+
 
         #region Constructor
         public InstallManager()
@@ -64,14 +65,14 @@ namespace Androdev.Core
         /// </summary>
         public string InstallRoot
         {
-            get { return _installRoot; }
+            get { return PathService.Instance.InstallRoot; }
             set
             {
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentException("Argument is null or empty", nameof(InstallRoot));
 
-                _installRoot = value;
-                Logger.Debug("Changed install path to " + InstallPath);
+                PathService.Initialize(value);
+                Logger.Debug("Changed install root to " + value);
             }
         }
         /// <summary>
@@ -87,45 +88,7 @@ namespace Androdev.Core
             }
         }
         #endregion
-
-        #region Private Properties
-        /// <summary>
-        /// Androdev install directory ([InstallRoot]\Androdev);
-        /// </summary>
-        private string InstallPath
-        {
-            get { return Path.Combine(InstallRoot, "Androdev"); }
-        }
-        /// <summary>
-        /// Eclipse install directory ([InstallRoot]\Androdev\eclipse);
-        /// </summary>
-        private string EclipsePath
-        {
-            get { return Path.Combine(InstallPath, "eclipse"); }
-        }
-        /// <summary>
-        /// eclipsec.exe file path ([InstallRoot]\eclipse\eclipsec.exe);
-        /// </summary>
-        private string EclipsecFilePath
-        {
-            get { return Path.Combine(InstallPath, "eclipse\\eclipsec.exe"); }
-        }
-        /// <summary>
-        /// Eclipse workspace directory ([InstallRoot]\Androdev\workspace);
-        /// </summary>
-        private string EclipseWorkspacePath
-        {
-            get { return Path.Combine(InstallPath, "workspace"); }
-        }
-        /// <summary>
-        /// Android SDK directory ([InstallRoot]\Androdev\android-sdk);
-        /// </summary>
-        private string AndroidSdkPath
-        {
-            get { return Path.Combine(InstallPath, "android-sdk"); }
-        }
-        #endregion
-
+        
         #region Events
         public event EventHandler InstallStarted;
         public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
@@ -356,9 +319,9 @@ namespace Androdev.Core
             WorkerReportProgress(28, 0, "Installing Android SDK Tools...", "Preparing to unpack...");
 
             // create directory and set count to 0
-            Directory.CreateDirectory(AndroidSdkPath);
+            Directory.CreateDirectory(Paths.AndroidSdkPath);
             Interlocked.Exchange(ref _extractedFile, 0);
-            Logger.Debug("Android SDK will extracted to: " + AndroidSdkPath);
+            Logger.Debug("Android SDK will extracted to: " + Paths.AndroidSdkPath);
 
             // define event subscriber
             var zipEvents = new FastZipEvents();
@@ -377,7 +340,7 @@ namespace Androdev.Core
 
                 // extract files
                 var androidZip = new FastZip(zipEvents);
-                androidZip.ExtractZip(InstallationHelpers.AndroidSdkPath, AndroidSdkPath, FastZip.Overwrite.Always, name => true, null, null, true);
+                androidZip.ExtractZip(InstallationHelpers.AndroidSdkPath, Paths.AndroidSdkPath, FastZip.Overwrite.Always, name => true, null, null, true);
 
                 Logger.Debug("Android SDK Tools installed.");
                 WorkerReportProgress(42, 100, "Android SDK Tools installed.");
@@ -397,9 +360,9 @@ namespace Androdev.Core
             WorkerReportProgress(42, 0, "Installing Eclipse Mars 2...", "Preparing to unpack...");
             
             // create output dir and set count to 0
-            Directory.CreateDirectory(EclipsePath);
+            Directory.CreateDirectory(Paths.EclipsePath);
             Interlocked.Exchange(ref _extractedFile, 0);
-            Logger.Debug("Eclipse IDE will extracted to: " + EclipsePath);
+            Logger.Debug("Eclipse IDE will extracted to: " + Paths.EclipsePath);
 
             // define event subscriber
             var zipEvents = new FastZipEvents();
@@ -417,7 +380,7 @@ namespace Androdev.Core
 
                 // extract files
                 var eclipseZip = new FastZip(zipEvents);
-                eclipseZip.ExtractZip(InstallationHelpers.EclipseIdePath, InstallPath, FastZip.Overwrite.Always, name => true, null, null, true);
+                eclipseZip.ExtractZip(InstallationHelpers.EclipseIdePath, Paths.InstallPath, FastZip.Overwrite.Always, name => true, null, null, true);
 
                 Logger.Debug("Eclipse IDE installed.");
             }
@@ -429,7 +392,7 @@ namespace Androdev.Core
             }
 
             // do post installation
-            PackageInstaller.EclipsePostInstall(InstallPath, EclipseWorkspacePath);
+            PackageInstaller.EclipsePostInstall();
 
             Logger.Debug("Eclipse configuration initialized successfully.");
             Logger.Info("==========Eclipse Mars 2 IDE [Finished]===========");
@@ -441,19 +404,19 @@ namespace Androdev.Core
             WorkerReportProgress(56, 63, "Creating manifest...");
 
             // create manifest for SDK Manager
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "android-sdk\\SDK Manager.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(Paths.InstallPath, "android-sdk\\SDK Manager.exe.manifest"));
             Logger.Debug("Manifest added to SDK Manager.");
 
             // create manifest for AVD Manager
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "android-sdk\\AVD Manager.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(Paths.InstallPath, "android-sdk\\AVD Manager.exe.manifest"));
             Logger.Debug("Manifest added to AVD Manager.");
 
             // create manifest for Eclipse IDE
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "eclipse\\eclipse.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(Paths.InstallPath, "eclipse\\eclipse.exe.manifest"));
             Logger.Debug("Manifest added to Eclipse IDE.");
 
             // create manifest for Eclipse Command Line
-            InstallationHelpers.CreateManifestFile(Path.Combine(InstallPath, "eclipse\\eclipsec.exe.manifest"));
+            InstallationHelpers.CreateManifestFile(Path.Combine(Paths.InstallPath, "eclipse\\eclipsec.exe.manifest"));
             Logger.Debug("Manifest added to Eclipse Command Line.");
 
             WorkerReportProgress(56, 100, "Manifest installed.");
@@ -467,7 +430,7 @@ namespace Androdev.Core
             
             // install ADT
             WorkerReportProgress(56, 63, "Installing Android Developer Tools...");
-            if (!PackageInstaller.InstallAdt(EclipsecFilePath))
+            if (!PackageInstaller.InstallAdt())
             {
                 WorkerReportProgress(0, 0, "Cannot install Android Developer Tools.");
                 Logger.Error("Cannot install Android Developer Tools.");
@@ -486,10 +449,10 @@ namespace Androdev.Core
             WorkerReportProgress(70, 63, "Configuring Eclipse IDE...");
 
             // variables
-            var eclipseConfigService = new EclipseConfigurator(InstallPath);
+            var eclipseConfigService = new EclipseConfigurator();
 
             // configure SDK path
-            if (!eclipseConfigService.ConfigureSdkPath(AndroidSdkPath))
+            if (!eclipseConfigService.ConfigureSdkPath(Paths.AndroidSdkPath))
             {
                 Logger.Error("Cannot change Android SDK path in ADT.");
                 WorkerReportProgress(0, 0, "Cannot configure Android SDK path.");
@@ -520,22 +483,22 @@ namespace Androdev.Core
 
             FastIo.CreateShortcut(new ShortcutProperties()
             {
-                Target = Path.Combine(InstallPath, "android-sdk\\SDK Manager.exe"),
+                Target = Path.Combine(Paths.InstallPath, "android-sdk\\SDK Manager.exe"),
                 Name = "Android SDK Tools",
                 Comment = "Launch Android SDK Tools.",
-                IconFile = Path.Combine(InstallPath, "android-sdk\\tools\\emulator.exe"),
+                IconFile = Path.Combine(Paths.InstallPath, "android-sdk\\tools\\emulator.exe"),
             });
 
             FastIo.CreateShortcut(new ShortcutProperties()
             {
-                Target = Path.Combine(InstallPath, "eclipse\\eclipse.exe"),
+                Target = Path.Combine(Paths.InstallPath, "eclipse\\eclipse.exe"),
                 Name = "Eclipse Mars for Android",
                 Comment = "Launch Eclipse Mars IDE for Android.",
             });
             
             FastIo.CreateShortcut(new ShortcutProperties()
             {
-                Target = Path.Combine(InstallPath, "workspace"),
+                Target = Path.Combine(Paths.InstallPath, "workspace"),
                 Name = "Eclipse Workspace",
                 Comment = "Eclipse workspace directory.",
             });

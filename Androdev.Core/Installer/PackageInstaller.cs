@@ -24,6 +24,7 @@ namespace Androdev.Core.Installer
     public static class PackageInstaller
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
+        private static readonly PathService Paths = PathService.Instance;
 
         private const string EclipsecSuccess = "Operation completed";
         private const string JdkInstallArguments = "/s ADDLOCAL=\"ToolsFeature,SourceFeature,PublicjreFeature\"";
@@ -35,8 +36,7 @@ namespace Androdev.Core.Installer
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
         public static bool InstallJavaDevelopmentKit()
         {
-            var jdkPath = Path.Combine(Commons.GetBaseDirectoryPath(), "bin\\jdk-8u101-windows-i586.exe");
-            var success = ProcessHelper.RunAndWait(jdkPath, JdkInstallArguments);
+            var success = ProcessHelper.RunWait(InstallationHelpers.JdkPath, JdkInstallArguments);
             Logger.Debug("JDK installation success: " + success);
 
             return success;
@@ -48,9 +48,10 @@ namespace Androdev.Core.Installer
         /// <param name="eclipsecPath">Fullpath to eclipsec.exe</param>
         /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
-        public static bool InstallAdt(string eclipsecPath)
+        public static bool InstallAdt()
         {
-            return ProcessHelper.RunAndWait(eclipsecPath, EclipseCommandBuilder.Build_ADTInstallCommand(InstallationHelpers.AdtPath), EclipsecSuccess);
+            var args = EclipseCommandBuilder.Build_ADTInstallCommand(InstallationHelpers.AdtPath);
+            return ProcessHelper.RunWait(Paths.EclipsecFilePath, args, EclipsecSuccess);
         }
 
         /// <summary>
@@ -60,12 +61,12 @@ namespace Androdev.Core.Installer
         /// <param name="workspaceDirectory"></param>
         /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
-        public static bool EclipsePostInstall(string androdevPath, string workspaceDirectory)
+        public static bool EclipsePostInstall()
         {
             Logger.Debug("Eclipse IDE Post-Install action...");
 
             // configure Eclipse
-            var eclipseConfigService = new EclipseConfigurator(androdevPath);
+            var eclipseConfigService = new EclipseConfigurator();
 
             // initialize Eclipse configuration
             if (!eclipseConfigService.InitializeEclipseConfiguration())
@@ -75,7 +76,7 @@ namespace Androdev.Core.Installer
             }
 
             // configure workspace path
-            Directory.CreateDirectory(workspaceDirectory);
+            Directory.CreateDirectory(Paths.EclipseWorkspacePath);
             if (!eclipseConfigService.ConfigureWorkspaceDirectory())
             {
                 Logger.Error("Cannot change Eclipse Workspace directory.");

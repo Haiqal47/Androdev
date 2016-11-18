@@ -85,7 +85,7 @@ namespace Androdev.Presenter
                 try // try to get file online
                 {
                     // request file
-                    var downloadUri = new Uri(UriProvider.GetUrlByIndex(i));
+                    var downloadUri = new Uri(PathService.GetUrlByIndex(i));
                     fileRequest = (HttpWebRequest)WebRequest.Create(downloadUri);
                     fileResponse = (HttpWebResponse)fileRequest.GetResponse();
 

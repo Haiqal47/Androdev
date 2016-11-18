@@ -26,8 +26,7 @@ namespace Androdev.Core
     public sealed class UninstallManager : IDisposable
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-
-        private string _installRoot;
+        private static readonly PathService Paths = PathService.Instance;
         private readonly BackgroundWorker _bwWorker;
 
         #region Properties
@@ -36,28 +35,18 @@ namespace Androdev.Core
         /// </summary>
         public string InstallRoot
         {
-            get { return _installRoot; }
+            get { return Paths.InstallRoot; }
             set
             {
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentException("Argument is null or empty", nameof(InstallRoot));
 
-                _installRoot = value;
-                Logger.Debug("Changed install path to " + InstallPath);
+                PathService.Initialize(value);
+                Logger.Debug("Changed install root to "  + value);
             }
         }
         #endregion
-
-        #region Private Properties
-        /// <summary>
-        /// Androdev install directory ([InstallRoot]\Androdev);
-        /// </summary>
-        private string InstallPath
-        {
-            get { return Path.Combine(InstallRoot, "Androdev"); }
-        }
-        #endregion
-
+        
         #region Constructor
         public UninstallManager()
         {
@@ -138,31 +127,41 @@ namespace Androdev.Core
             }
 
             // delete all files
-            using (var enumer = FastIo.EnumerateFiles(InstallPath, SearchOption.AllDirectories).GetEnumerator())
+            using (var enumer = FastIo.EnumerateFiles(Paths.InstallPath, SearchOption.AllDirectories).GetEnumerator())
             {
                 var errorAttempt = 0;
                 while (enumer.MoveNext())
                 {
+                    // checks if current is null
                     if (enumer.Current == null) continue;
-                    if (errorAttempt >= 10) return;
+
+                    // checks for deleteion attempt
+                    if (errorAttempt >= 10)
+                    {
+                        WorkerReportProgress(0, "Cannot remove Androdev. See log file.");
+                        return;
+                    }
+                    
                     try
                     {
+                        // try to delete
                         File.Delete(enumer.Current.FullPath);
                         WorkerReportProgress(10, enumer.Current.Name);
                     }
                     catch (Exception ex)
                     {
+                        // unable to delete
                         errorAttempt++;
-                        WorkerReportProgress(0,enumer.Current.Name + ":Delete file failed.");
+                        WorkerReportProgress(0,enumer.Current.Name + ": delete file failed.");
                         Logger.Error(ex);
                     }
-                }
-            }
+                } // end while
+            } // end using
 
             // delete old directory
             try
             {
-                Directory.Delete(InstallPath, true);
+                Directory.Delete(Paths.InstallPath, true);
             }
             catch (Exception ex)
             {
