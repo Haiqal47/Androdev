@@ -27,7 +27,7 @@ namespace Androdev.Core
     public sealed class UpdateManager : IDisposable
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        private static readonly PathService Paths = PathService.Instance();
+        private PathService _paths;
         private readonly BackgroundWorker _bwDownloader;
         
         #region Events
@@ -38,12 +38,14 @@ namespace Androdev.Core
         #endregion
 
         #region Constructor
-        public UpdateManager()
+        public UpdateManager(string root)
         {
             _bwDownloader = new BackgroundWorker { WorkerSupportsCancellation = true };
             _bwDownloader.DoWork += Worker_DoWork;
             _bwDownloader.RunWorkerCompleted += Worker_RunWorkerCompleted;
             _bwDownloader.ProgressChanged += Worker_ProgressChanged;
+
+            _paths = new PathService(root);
         }
         #endregion
 
@@ -99,7 +101,7 @@ namespace Androdev.Core
         {
             // remove files
             Logger.Debug("Attempt to remove Androdev binary files.");
-            using (var enumer = FastIo.EnumerateFiles(Paths.InstallPath, SearchOption.AllDirectories).GetEnumerator())
+            using (var enumer = FastIo.EnumerateFiles(_paths.InstallPath, SearchOption.AllDirectories).GetEnumerator())
             {
                 while (enumer.MoveNext())
                 {
@@ -121,7 +123,7 @@ namespace Androdev.Core
             Logger.Debug("Attempt to remove Androdev binaries directory.");
             try
             {
-                Directory.Delete(Paths.BinariesPath, true);
+                Directory.Delete(_paths.BinariesPath, true);
                 Logger.Debug("Removed Androdev binaries directory.");
             }
             catch (Exception ex)
@@ -162,7 +164,7 @@ namespace Androdev.Core
             // prepare variables
             var fileSize = fileResponse.ContentLength;
             var fileName = Commons.GetFilenameFromUri(downloadUri);
-            var fullFilePath = Path.Combine(Paths.BinariesPath, fileName);
+            var fullFilePath = Path.Combine(_paths.BinariesPath, fileName);
 
             // update progress
             Logger.Debug($"Requesting file: {fileName} ({fileSize})");
@@ -228,7 +230,7 @@ namespace Androdev.Core
 
             // create new bin folder
             Logger.Debug("Fresh binaries directory created.");
-            Directory.CreateDirectory(Paths.BinariesPath);
+            Directory.CreateDirectory(_paths.BinariesPath);
 
             // download each files
             for (int i = 0; i < 5; i++)

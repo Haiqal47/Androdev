@@ -22,6 +22,7 @@ using Androdev.View;
 using System.IO;
 using System.Net;
 using Androdev.Core.Args;
+using Androdev.Core.Installer;
 
 namespace Androdev.Presenter
 {
@@ -42,7 +43,7 @@ namespace Androdev.Presenter
         {
             _view = view;
             _model = new UpdatePackagesModel();
-            _manager = new UpdateManager();
+            _manager = new UpdateManager(InstallationHelpers.FindAndrodevInstallation());
             _manager.UpdateStarted += Manager_UpdateStarted;
             _manager.DownloadStarted += Manager_DownloadStarted;
             _manager.ProgressChanged += Manager_ProgressChanged;

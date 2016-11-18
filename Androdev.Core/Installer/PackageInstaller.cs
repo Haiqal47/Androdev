@@ -24,7 +24,6 @@ namespace Androdev.Core.Installer
     public static class PackageInstaller
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        private static readonly PathService Paths = PathService.Instance();
 
         private const string EclipsecSuccess = "Operation completed";
         private const string JdkInstallArguments = "/s ADDLOCAL=\"ToolsFeature,SourceFeature,PublicjreFeature\"";
@@ -49,10 +48,10 @@ namespace Androdev.Core.Installer
         /// <param name="eclipsecPath">Fullpath to eclipsec.exe</param>
         /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
-        public static bool InstallAdt()
+        public static bool InstallAdt(string eclipsecPath)
         {
             var args = EclipseCommandBuilder.Build_ADTInstallCommand(InstallationHelpers.AdtPath);
-            return ProcessHelper.RunWait(Paths.EclipsecFilePath, args, EclipsecSuccess);
+            return ProcessHelper.RunWait(eclipsecPath, args, EclipsecSuccess);
         }
 
         /// <summary>
@@ -62,12 +61,12 @@ namespace Androdev.Core.Installer
         /// <param name="workspaceDirectory"></param>
         /// <returns></returns>
         [PermissionSet(SecurityAction.LinkDemand, Name = "FullTrust", Unrestricted = false)]
-        public static bool EclipsePostInstall()
+        public static bool EclipsePostInstall(string root)
         {
             Logger.Debug("Eclipse IDE Post-Install action...");
 
             // configure Eclipse
-            var eclipseConfigService = new EclipseConfigurator();
+            var eclipseConfigService = new EclipseConfigurator(root);
 
             // initialize Eclipse configuration
             if (!eclipseConfigService.InitializeEclipseConfiguration())
@@ -77,7 +76,6 @@ namespace Androdev.Core.Installer
             }
 
             // configure workspace path
-            Directory.CreateDirectory(Paths.EclipseWorkspacePath);
             if (!eclipseConfigService.ConfigureWorkspaceDirectory())
             {
                 Logger.Error("Cannot change Eclipse Workspace directory.");

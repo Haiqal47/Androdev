@@ -15,6 +15,7 @@
 using System;
 using System.IO;
 using Microsoft.Win32;
+using Androdev.Core.IO;
 
 namespace Androdev.Core.Installer
 {
@@ -91,7 +92,18 @@ namespace Androdev.Core.Installer
             }
             return 0;
         }
-        
+
+        /// <summary>
+        /// FInd Androdev installation.
+        /// </summary>
+        /// <returns></returns>
+        public static string FindAndrodevInstallation()
+        {
+            var ds = FastIo.GetAvailiableDrives();
+            var index = FindAndrodevInstallation(ds);
+            return ds[index].Name;
+        }
+
         /// <summary>
         /// Gets Java Development Kit installation path (JAVA_HOME).
         /// </summary>

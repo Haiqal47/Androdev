@@ -27,7 +27,7 @@ namespace Androdev.Core
     public sealed class UninstallManager : IDisposable
     {
         private static readonly LogManager Logger = LogManager.GetClassLogger();
-        private static readonly PathService Paths = PathService.Instance();
+        private PathService _paths;
         private readonly BackgroundWorker _bwWorker;
 
         #region Properties
@@ -36,13 +36,14 @@ namespace Androdev.Core
         /// </summary>
         public string InstallRoot
         {
-            get { return Paths.InstallRoot; }
+            get { return _paths.InstallRoot; }
             set
             {
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentException("Argument is null or empty", nameof(InstallRoot));
 
-                PathService.Initialize(value);
+                _paths = null;
+                _paths = new PathService(value);
                 Logger.Debug("Changed install root to "  + value);
             }
         }
@@ -127,7 +128,7 @@ namespace Androdev.Core
             }
 
             // delete all files
-            using (var enumer = FastIo.EnumerateFiles(Paths.InstallPath, SearchOption.AllDirectories).GetEnumerator())
+            using (var enumer = FastIo.EnumerateFiles(_paths.InstallPath, SearchOption.AllDirectories).GetEnumerator())
             {
                 var errorAttempt = 0;
                 while (enumer.MoveNext())
@@ -161,7 +162,7 @@ namespace Androdev.Core
             // delete old directory
             try
             {
-                Directory.Delete(Paths.InstallPath, true);
+                Directory.Delete(_paths.InstallPath, true);
             }
             catch (Exception ex)
             {

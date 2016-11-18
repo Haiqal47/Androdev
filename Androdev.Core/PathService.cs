@@ -31,32 +31,9 @@ namespace Androdev.Core
         private const string EclipseMars2 = "http://eclipse.mirror.rafal.ca/technology/epp/downloads/release/mars/2/eclipse-java-mars-2-win32.zip";
 
         private string _installRoot;
-        private static PathService _instance;
-        private static readonly object _lockPad = new object();
-
-        #region Static Instance
-        /// <summary>
-        /// Gets latest instance of this class.
-        /// </summary>
-        public static PathService Instance()
-        {
-             lock (_lockPad)
-            {
-                return _instance;
-            }
-        }
-        /// <summary>
-        /// Initialize new instance of <see cref="PathService"/> class. 
-        /// </summary>
-        /// <param name="root"></param>
-        public static void Initialize(string root)
-        {
-            _instance = new PathService(root);
-        }
-        #endregion
 
         #region Constructor
-        private PathService(string root)
+        internal PathService(string root)
         {
             _installRoot = root; 
         }
